@@ -1,13 +1,11 @@
 services:
   - type: web
     name: maak-backend-staging
-    env: php
-    rootDir: backend
+    env: docker
     plan: starter
     autoDeploy: false
-    buildCommand: composer install --no-dev --optimize-autoloader
-    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
-    postDeployCommand: php artisan migrate --force && php artisan db:seed --class=DatabaseSeeder --force
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
     healthCheckPath: /up
     envVars:
       - key: APP_ENV
