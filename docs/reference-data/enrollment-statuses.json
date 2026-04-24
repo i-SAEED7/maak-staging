@@ -1,0 +1,6 @@
+[
+  { "key": "active", "display_name_ar": "نشط" },
+  { "key": "graduated", "display_name_ar": "متخرج" },
+  { "key": "transferred", "display_name_ar": "منقول" },
+  { "key": "archived", "display_name_ar": "مؤرشف" }
+]

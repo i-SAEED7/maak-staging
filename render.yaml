@@ -1,0 +1,117 @@
+services:
+  - type: web
+    name: maak-backend-staging
+    env: php
+    rootDir: backend
+    plan: starter
+    autoDeploy: false
+    buildCommand: composer install --no-dev --optimize-autoloader
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    postDeployCommand: php artisan migrate --force && php artisan db:seed --class=DatabaseSeeder --force
+    healthCheckPath: /up
+    envVars:
+      - key: APP_ENV
+        value: staging
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        value: https://staging-api.example.com
+      - key: FRONTEND_URL
+        value: https://staging-frontend.example.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://staging-frontend.example.com
+      - key: SANCTUM_STATEFUL_DOMAINS
+        value: staging-frontend.example.com
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: maak-staging-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: maak-staging-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: maak-staging-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: maak-staging-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: maak-staging-db
+          property: password
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: SESSION_SAME_SITE
+        value: lax
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: MAIL_MAILER
+        value: log
+
+  - type: worker
+    name: maak-queue-staging
+    env: php
+    rootDir: backend
+    plan: starter
+    autoDeploy: false
+    buildCommand: composer install --no-dev --optimize-autoloader
+    startCommand: php artisan queue:work --tries=1 --timeout=90
+    envVars:
+      - key: APP_ENV
+        value: staging
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        sync: false
+      - key: APP_URL
+        value: https://staging-api.example.com
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: maak-staging-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: maak-staging-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: maak-staging-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: maak-staging-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: maak-staging-db
+          property: password
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: SESSION_DRIVER
+        value: database
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: MAIL_MAILER
+        value: log
+
+databases:
+  - name: maak-staging-db
+    databaseName: maak_staging
+    user: maak_staging_user

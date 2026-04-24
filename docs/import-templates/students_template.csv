@@ -1,0 +1,2 @@
+school_code,student_number,first_name,father_name,grandfather_name,family_name,gender,birth_date,grade_level,classroom,enrollment_status,academic_year_name,education_program_code,disability_category_code,primary_teacher_email,joined_at,transportation_notes
+SCH-001,ST-1001,سلمان,أحمد,محمد,القحطاني,male,2015-04-16,الرابع,4A,active,1447-1448,GEN-SUPPORT,AUTISM,teacher.school1@example.com,2025-08-25,يحضر مع ولي الأمر

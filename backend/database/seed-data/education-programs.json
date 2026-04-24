@@ -1,0 +1,4 @@
+[
+  { "code": "yasir_learning", "name_ar": "يسير التعليمي", "description": "برنامج دعم تعليمي لذوي الإعاقة", "is_active": true },
+  { "code": "adhd_support", "name_ar": "فرط حركة وتشتت انتباه", "description": "برنامج دعم مخصص للطلاب ذوي الإعاقة من فئة فرط الحركة وتشتت الانتباه", "is_active": true }
+]

@@ -1,0 +1,2 @@
+school_code,name_ar,name_en,ministry_code,region,city,district,address,phone,email,status,storage_quota_mb
+SCH-001,مدرسة النور لذوي الإعاقة,Al Noor Disability Support School,MOE-001,الرياض,الرياض,العليا,"حي العليا، الرياض",0110000001,school1@example.com,active,4096

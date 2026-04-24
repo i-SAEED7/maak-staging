@@ -1,0 +1,7 @@
+[
+  { "code": "inclusion", "name_ar": "برنامج الدمج", "description": "دمج داخل التعليم العام", "is_active": true },
+  { "code": "resource_room", "name_ar": "غرفة المصادر", "description": "دعم جزئي داخل المدرسة", "is_active": true },
+  { "code": "special_class", "name_ar": "فصل خاص", "description": "فصول متخصصة داخل المدرسة", "is_active": true },
+  { "code": "special_institute", "name_ar": "معهد متخصص", "description": "معاهد ذوي الإعاقة", "is_active": true },
+  { "code": "early_intervention", "name_ar": "تدخل مبكر", "description": "برامج التدخل المبكر", "is_active": true }
+]

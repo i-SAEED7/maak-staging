@@ -1,0 +1,5 @@
+[
+  { "key": "scheduled", "display_name_ar": "مجدولة" },
+  { "key": "completed", "display_name_ar": "مكتملة" },
+  { "key": "cancelled", "display_name_ar": "ملغاة" }
+]

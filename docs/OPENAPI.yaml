@@ -1,0 +1,307 @@
+openapi: 3.0.3
+info:
+  title: Disability Education Portal API
+  version: 1.0.0-blueprint
+  description: >
+    مخطط OpenAPI أولي مشتق من وثائق المشروع داخل المستودع.
+servers:
+  - url: /api/v1
+paths:
+  /auth/login:
+    post:
+      summary: تسجيل الدخول
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+  /schools:
+    get:
+      summary: قائمة المدارس
+      parameters:
+        - in: query
+          name: filter[status]
+          schema:
+            type: string
+        - in: query
+          name: filter[region]
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Schools list
+    post:
+      summary: إنشاء مدرسة
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SchoolPayload"
+      responses:
+        "201":
+          description: School created
+  /users:
+    get:
+      summary: قائمة المستخدمين
+      responses:
+        "200":
+          description: Users list
+    post:
+      summary: إنشاء مستخدم
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPayload"
+      responses:
+        "201":
+          description: User created
+  /students:
+    get:
+      summary: قائمة الطلاب
+      responses:
+        "200":
+          description: Students list
+    post:
+      summary: إنشاء طالب
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentPayload"
+      responses:
+        "201":
+          description: Student created
+  /iep-plans:
+    get:
+      summary: قائمة الخطط الفردية
+      responses:
+        "200":
+          description: IEP plans list
+    post:
+      summary: إنشاء مسودة خطة
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IepPlanPayload"
+      responses:
+        "201":
+          description: Draft created
+  /iep-plans/{id}/submit:
+    post:
+      summary: إرسال الخطة للمراجعة
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Transition applied
+  /student-reports:
+    get:
+      summary: قائمة التقارير الدورية
+      responses:
+        "200":
+          description: Reports list
+    post:
+      summary: إنشاء تقرير دوري
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentReportPayload"
+      responses:
+        "201":
+          description: Report draft created
+  /notifications:
+    get:
+      summary: قائمة الإشعارات
+      responses:
+        "200":
+          description: Notifications list
+  /messages:
+    get:
+      summary: قائمة الرسائل
+      responses:
+        "200":
+          description: Threads list
+    post:
+      summary: إرسال رسالة
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessagePayload"
+      responses:
+        "201":
+          description: Message sent
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required: [identifier, password]
+      properties:
+        identifier:
+          type: string
+        password:
+          type: string
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+            user:
+              $ref: "#/components/schemas/UserEntity"
+            permissions:
+              type: array
+              items:
+                type: string
+    SchoolPayload:
+      type: object
+      required: [name_ar, region, city]
+      properties:
+        name_ar:
+          type: string
+        region:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        storage_quota_mb:
+          type: integer
+    UserPayload:
+      type: object
+      required: [role, full_name, password]
+      properties:
+        role:
+          type: string
+        school_id:
+          type: integer
+        full_name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        national_id:
+          type: string
+        password:
+          type: string
+    StudentPayload:
+      type: object
+      required: [school_id, first_name, family_name, gender]
+      properties:
+        school_id:
+          type: integer
+        education_program_id:
+          type: integer
+        disability_category_id:
+          type: integer
+        primary_teacher_user_id:
+          type: integer
+        first_name:
+          type: string
+        father_name:
+          type: string
+        family_name:
+          type: string
+        gender:
+          type: string
+        birth_date:
+          type: string
+          format: date
+    IepPlanPayload:
+      type: object
+      required: [student_id, title]
+      properties:
+        student_id:
+          type: integer
+        academic_year_id:
+          type: integer
+        title:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        summary:
+          type: string
+        goals:
+          type: array
+          items:
+            type: object
+    StudentReportPayload:
+      type: object
+      required: [student_id, report_type, report_period_label, content_json]
+      properties:
+        student_id:
+          type: integer
+        report_type:
+          type: string
+        report_period_label:
+          type: string
+        content_json:
+          type: object
+    SendMessagePayload:
+      type: object
+      required: [recipient_ids, body]
+      properties:
+        recipient_ids:
+          type: array
+          items:
+            type: integer
+        subject:
+          type: string
+        body:
+          type: string
+    UserEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+        uuid:
+          type: string
+        full_name:
+          type: string
+        role:
+          type: string
+        school_id:
+          type: integer
+          nullable: true

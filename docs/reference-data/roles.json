@@ -1,0 +1,32 @@
+[
+  {
+    "name": "super_admin",
+    "display_name_ar": "المدير العام للنظام",
+    "description": "صلاحية كاملة على مستوى النظام"
+  },
+  {
+    "name": "admin",
+    "display_name_ar": "الإداري العام",
+    "description": "صلاحيات مساندة وإدارية حسب الإعداد"
+  },
+  {
+    "name": "supervisor",
+    "display_name_ar": "المشرف التربوي",
+    "description": "إشراف على مجموعة مدارس"
+  },
+  {
+    "name": "principal",
+    "display_name_ar": "مدير المدرسة",
+    "description": "إدارة مدرسة واحدة"
+  },
+  {
+    "name": "teacher",
+    "display_name_ar": "المعلم",
+    "description": "إدارة الطلاب والخطط والتقارير"
+  },
+  {
+    "name": "parent",
+    "display_name_ar": "ولي الأمر",
+    "description": "الاطلاع على بيانات الأبناء والتواصل"
+  }
+]

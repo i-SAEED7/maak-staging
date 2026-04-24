@@ -1,0 +1,32 @@
+[
+  {
+    "key": "draft",
+    "display_name_ar": "مسودة",
+    "transitions_to": ["pending_principal_review"]
+  },
+  {
+    "key": "pending_principal_review",
+    "display_name_ar": "بانتظار مراجعة المدير",
+    "transitions_to": ["pending_supervisor_review", "rejected"]
+  },
+  {
+    "key": "pending_supervisor_review",
+    "display_name_ar": "بانتظار اعتماد المشرف",
+    "transitions_to": ["approved", "rejected"]
+  },
+  {
+    "key": "approved",
+    "display_name_ar": "معتمدة",
+    "transitions_to": ["archived"]
+  },
+  {
+    "key": "rejected",
+    "display_name_ar": "مرفوضة",
+    "transitions_to": ["draft"]
+  },
+  {
+    "key": "archived",
+    "display_name_ar": "مؤرشفة",
+    "transitions_to": []
+  }
+]

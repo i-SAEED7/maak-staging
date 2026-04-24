@@ -1,0 +1,10 @@
+[
+  { "code": "learning_disabilities", "name_ar": "صعوبات تعلم", "description": "برامج صعوبات التعلم", "is_active": true },
+  { "code": "hearing_impairment", "name_ar": "إعاقة سمعية", "description": "برامج الإعاقة السمعية", "is_active": true },
+  { "code": "visual_impairment", "name_ar": "إعاقة بصرية", "description": "برامج الإعاقة البصرية", "is_active": true },
+  { "code": "autism", "name_ar": "اضطراب طيف التوحد", "description": "برامج التوحد", "is_active": true },
+  { "code": "intellectual_disability", "name_ar": "إعاقة فكرية", "description": "برامج الإعاقة الفكرية", "is_active": true },
+  { "code": "multiple_disabilities", "name_ar": "إعاقات متعددة", "description": "برامج الإعاقات المتعددة", "is_active": true },
+  { "code": "speech_disorders", "name_ar": "اضطرابات النطق والكلام", "description": "دعم علاجي وتربوي", "is_active": true },
+  { "code": "physical_disability", "name_ar": "إعاقة حركية", "description": "الدعم الحركي والتكيفي", "is_active": true }
+]

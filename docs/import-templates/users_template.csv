@@ -1,0 +1,4 @@
+school_code,role,full_name,email,phone,status,locale,password,notes
+SCH-001,principal,مدير المدرسة,principal.school1@example.com,0500000001,active,ar,Password@123,
+SCH-001,teacher,معلم تجريبي,teacher.school1@example.com,0500000002,active,ar,Password@123,
+SCH-001,parent,ولي أمر تجريبي,parent.school1@example.com,0500000003,active,ar,Password@123,

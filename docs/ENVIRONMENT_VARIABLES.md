@@ -1,0 +1,39 @@
+# متغيرات البيئة
+
+## عامة
+
+- `APP_NAME`
+- `APP_ENV`
+- `APP_URL`
+- `APP_PORT`
+
+## الخلفية
+
+- `DB_CONNECTION`
+- `DB_HOST`
+- `DB_PORT`
+- `DB_DATABASE`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `REDIS_HOST`
+- `REDIS_PORT`
+- `MAIL_MAILER`
+- `MAIL_HOST`
+- `MAIL_PORT`
+- `MAIL_USERNAME`
+- `MAIL_PASSWORD`
+
+## الملفات
+
+- `MINIO_ROOT_USER`
+- `MINIO_ROOT_PASSWORD`
+- `MINIO_PORT`
+- `MINIO_CONSOLE_PORT`
+- `MINIO_BUCKET`
+
+## الواجهة
+
+- `VITE_APP_NAME`
+- `VITE_API_BASE_URL`
+- `VITE_DEFAULT_LOCALE`
+- `VITE_ENABLE_MAPS`
