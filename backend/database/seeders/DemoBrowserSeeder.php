@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\IepPlanStatus;
+use App\Enums\RoleName;
 use App\Models\AcademicYear;
 use App\Models\DisabilityCategory;
 use App\Models\EducationProgram;
@@ -33,6 +34,13 @@ class DemoBrowserSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call([
+            RoleSeeder::class,
+            PermissionSeeder::class,
+            RolePermissionSeeder::class,
+            ReferenceDataSeeder::class,
+        ]);
+
         $school = School::query()->updateOrCreate(
             ['school_code' => 'JED-P-00001'],
             [
@@ -61,16 +69,16 @@ class DemoBrowserSeeder extends Seeder
         );
 
         $roles = Role::query()->whereIn('name', [
-            'super_admin',
-            'admin',
-            'supervisor',
-            'principal',
-            'teacher',
-            'parent',
+            RoleName::SUPER_ADMIN,
+            RoleName::ADMIN,
+            RoleName::SUPERVISOR,
+            RoleName::PRINCIPAL,
+            RoleName::TEACHER,
+            RoleName::PARENT,
         ])->get()->keyBy('name');
 
         $superAdmin = $this->upsertUser(
-            roleId: (int) $roles['super_admin']->id,
+            roleId: (int) $roles[RoleName::SUPER_ADMIN]->id,
             fullName: 'مدير النظام التجريبي',
             email: 'superadmin@maak.local',
             phone: '0500000001',
@@ -80,7 +88,7 @@ class DemoBrowserSeeder extends Seeder
         );
 
         $admin = $this->upsertUser(
-            roleId: (int) $roles['admin']->id,
+            roleId: (int) $roles[RoleName::ADMIN]->id,
             fullName: 'الإداري التجريبي',
             email: 'admin@maak.local',
             phone: '0500000006',
@@ -90,7 +98,7 @@ class DemoBrowserSeeder extends Seeder
         );
 
         $supervisor = $this->upsertUser(
-            roleId: (int) $roles['supervisor']->id,
+            roleId: (int) $roles[RoleName::SUPERVISOR]->id,
             fullName: 'المشرف التجريبي',
             email: 'supervisor@maak.local',
             phone: '0500000002',
@@ -100,7 +108,7 @@ class DemoBrowserSeeder extends Seeder
         );
 
         $principal = $this->upsertUser(
-            roleId: (int) $roles['principal']->id,
+            roleId: (int) $roles[RoleName::PRINCIPAL]->id,
             fullName: 'مدير المدرسة التجريبي',
             email: 'principal@maak.local',
             phone: '0500000003',
@@ -110,7 +118,7 @@ class DemoBrowserSeeder extends Seeder
         );
 
         $teacher = $this->upsertUser(
-            roleId: (int) $roles['teacher']->id,
+            roleId: (int) $roles[RoleName::TEACHER]->id,
             fullName: 'المعلم التجريبي',
             email: 'teacher@maak.local',
             phone: '0500000004',
@@ -120,7 +128,7 @@ class DemoBrowserSeeder extends Seeder
         );
 
         $parent = $this->upsertUser(
-            roleId: (int) $roles['parent']->id,
+            roleId: (int) $roles[RoleName::PARENT]->id,
             fullName: 'ولي الأمر التجريبي',
             email: 'parent@maak.local',
             phone: '0500000005',
