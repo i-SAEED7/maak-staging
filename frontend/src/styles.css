@@ -1361,3 +1361,594 @@ textarea {
     flex-direction: column;
   }
 }
+
+/* Mobile-first responsive hardening */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  direction: rtl;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+.app-shell,
+.content-shell,
+.content-panel,
+.portal-shell,
+.portal-main,
+.portal-page-stack,
+.portal-surface,
+.portal-map-card,
+.portal-map-stage,
+.school-site-layout,
+.surface-card,
+.hero-card,
+.table-card,
+.auth-card,
+.stats-grid,
+.card-grid,
+.grid-two,
+.detail-grid,
+.filters-bar,
+.permission-module-grid {
+  min-width: 0;
+}
+
+.button,
+.portal-button,
+.portal-login-button,
+.nav-link,
+.school-site-nav-link,
+.checkbox-dropdown-trigger {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.field input,
+.field select,
+.field textarea,
+.context-select,
+.dropdown-search-input {
+  min-height: 46px;
+}
+
+.table-card {
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+  :root {
+    font-size: 16px;
+  }
+
+  body {
+    min-width: 0;
+  }
+
+  .auth-shell,
+  .app-shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+    padding: 10px;
+  }
+
+  .sidebar-panel {
+    position: static;
+    height: auto;
+    padding: 16px;
+    gap: 14px;
+    border-radius: 18px;
+  }
+
+  .brand-block h1,
+  .hero-card h2,
+  .page-header h2,
+  .portal-hero h1,
+  .portal-section-heading h2,
+  .portal-school-hero h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .brand-block h1,
+  .page-header h2 {
+    font-size: 1.45rem;
+  }
+
+  .hero-card h2,
+  .portal-section-heading h2 {
+    font-size: 1.55rem;
+  }
+
+  .content-shell,
+  .page-stack,
+  .form-stack,
+  .portal-page-stack,
+  .school-site-layout {
+    gap: 14px;
+  }
+
+  .auth-card,
+  .hero-card,
+  .surface-card,
+  .content-panel,
+  .topbar,
+  .table-card,
+  .shortcut-card,
+  .info-box,
+  .loading-box,
+  .error-box,
+  .portal-surface,
+  .portal-hero,
+  .portal-card,
+  .portal-quote-card,
+  .portal-stat-card,
+  .portal-map-card,
+  .portal-map-school,
+  .portal-contact-note,
+  .portal-school-hero {
+    border-radius: 18px;
+    padding: 16px;
+  }
+
+  .topbar,
+  .page-header,
+  .school-site-head,
+  .portal-footer,
+  .permission-module-head {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .topbar-meta,
+  .chip-row,
+  .button-row,
+  .portal-button-row,
+  .school-site-nav,
+  .portal-slider-controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .button,
+  .portal-button,
+  .portal-login-button,
+  .nav-link,
+  .school-site-nav-link {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.95rem 1rem;
+    justify-content: center;
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  .field {
+    gap: 7px;
+  }
+
+  .field > span,
+  .detail-label,
+  .context-label,
+  .section-description,
+  .table-subtext {
+    font-size: 0.96rem;
+  }
+
+  .field input,
+  .field select,
+  .field textarea,
+  .context-select,
+  .dropdown-search-input {
+    min-height: 50px;
+    padding: 0.95rem 1rem;
+    border-radius: 14px;
+    font-size: 1rem;
+  }
+
+  .grid-two,
+  .detail-grid,
+  .stats-grid,
+  .card-grid,
+  .filters-bar,
+  .filters-bar-wide,
+  .permission-module-grid,
+  .portal-grid-two,
+  .portal-grid-three,
+  .portal-grid-four,
+  .portal-login-choice-grid,
+  .school-site-meta-grid,
+  .portal-map-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .shortcut-card {
+    min-height: auto;
+  }
+
+  .stat-card,
+  .goal-card,
+  .map-placeholder,
+  .detail-list-item,
+  .context-card,
+  .permission-module-card {
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .stat-card strong,
+  .detail-grid strong {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .stat-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+  }
+
+  .data-table {
+    min-width: 680px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+
+  .pagination-bar,
+  .pagination-pages {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .pagination-pages .button,
+  .compact-actions .button {
+    width: 100%;
+  }
+
+  .checkbox-dropdown-panel {
+    position: fixed;
+    inset: auto 10px 10px 10px;
+    width: auto;
+    max-height: min(72vh, 520px);
+    overflow: hidden;
+    padding: 0.85rem;
+    border-radius: 18px;
+  }
+
+  .selection-list {
+    max-height: 48vh;
+  }
+
+  .selection-option {
+    min-height: 48px;
+    padding: 12px;
+  }
+
+  .selection-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+  }
+
+  .dropdown-close-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .portal-header {
+    padding: 12px 10px 0;
+  }
+
+  .portal-nav-shell {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .portal-brand {
+    text-align: center;
+  }
+
+  .portal-brand span {
+    font-size: 0.82rem;
+  }
+
+  .portal-brand strong {
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+
+  .portal-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 8px;
+  }
+
+  .portal-nav-link {
+    min-height: 42px;
+    padding: 0.65rem 0.75rem;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(21, 68, 90, 0.05);
+    font-size: 0.94rem;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .portal-nav-link[href="/login"] {
+    display: none;
+  }
+
+  .portal-nav-actions {
+    display: grid;
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .portal-login-button {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+
+  .portal-main {
+    width: 100%;
+    padding: 14px 10px 32px;
+  }
+
+  .portal-footer {
+    padding: 0 12px 24px;
+  }
+
+  .portal-hero-slider {
+    min-height: 260px;
+    gap: 14px;
+  }
+
+  .portal-hero h1 {
+    font-size: 1.62rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-section-heading {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .portal-section-heading h2 {
+    font-size: 1.38rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-hero p,
+  .portal-card p,
+  .portal-quote-card p,
+  .portal-map-sidebar p,
+  .portal-school-hero p,
+  .portal-choice-card p {
+    font-size: 1rem;
+    line-height: 1.85;
+  }
+
+  .portal-card-link {
+    min-height: auto;
+  }
+
+  .portal-stat-card strong {
+    font-size: 1.75rem;
+  }
+
+  .portal-map-stage {
+    min-height: 300px;
+    border-radius: 18px;
+  }
+
+  .portal-map-card.is-compact .portal-map-stage {
+    min-height: 280px;
+  }
+
+  .portal-map-marker,
+  .portal-map-marker span {
+    width: 28px;
+    height: 28px;
+  }
+
+  .portal-map-sidebar {
+    gap: 12px;
+  }
+
+  .portal-map-list-item,
+  .portal-school-card {
+    min-height: 54px;
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .portal-choice-card {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .portal-choice-card h3 {
+    font-size: 1.22rem;
+  }
+
+  .school-site-layout {
+    gap: 12px;
+  }
+
+  .school-site-head {
+    gap: 10px;
+  }
+
+  .school-site-intro {
+    gap: 8px;
+  }
+
+  .school-site-intro h2 {
+    font-size: 1.35rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .school-site-intro p {
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+
+  .school-site-meta-grid {
+    gap: 10px;
+  }
+
+  .school-site-meta-grid .portal-stat-card {
+    padding: 12px 14px;
+  }
+
+  .school-site-meta-grid .portal-stat-card strong {
+    font-size: 1.08rem;
+    line-height: 1.45;
+  }
+
+  .school-site-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .school-site-nav-link {
+    min-height: 42px;
+    padding: 0.68rem 0.75rem;
+    border-radius: 14px;
+    font-size: 0.94rem;
+    line-height: 1.35;
+  }
+
+  .nav-stack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .nav-link {
+    min-height: 42px;
+    padding: 0.72rem 0.7rem;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    line-height: 1.35;
+  }
+
+  .nav-link-content {
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .content-panel {
+    padding: 14px;
+  }
+
+  .hero-card {
+    padding: 15px;
+  }
+
+  .hero-card h2 {
+    font-size: 1.32rem;
+    line-height: 1.45;
+  }
+
+  .shortcut-card {
+    padding: 14px;
+    gap: 6px;
+  }
+
+  .shortcut-card p {
+    margin: 0;
+    line-height: 1.65;
+  }
+
+  .school-slider-surface {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .school-slider-content h3 {
+    font-size: 1.2rem;
+  }
+
+  .school-slider-dot {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .file-preview-frame {
+    min-height: 320px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 767px) {
+  .app-shell,
+  .auth-shell,
+  .portal-grid-four,
+  .portal-grid-three,
+  .portal-grid-two,
+  .school-site-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .app-shell,
+  .auth-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .card-grid,
+  .stats-grid,
+  .portal-grid-four,
+  .portal-grid-three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .portal-grid-two,
+  .grid-two,
+  .detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .portal-map-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .button,
+  .portal-button,
+  .portal-login-button {
+    width: auto;
+  }
+}
