@@ -10,6 +10,7 @@ use App\Models\School;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class SchoolService
@@ -26,11 +27,7 @@ class SchoolService
         $actor = auth()->user();
 
         return School::query()
-            ->with([
-                'principal:id,full_name,email',
-                'supervisor:id,full_name,email',
-                'educationPrograms:id,code,name_ar',
-            ])
+            ->with($this->schoolRelations())
             ->withCount('students')
             ->withCount([
                 'users as teachers_count' => fn (Builder $query) => $query->whereHas(
@@ -135,9 +132,7 @@ class SchoolService
     public function load(School $school): School
     {
         return $school->load([
-            'principal:id,full_name,email',
-            'supervisor:id,full_name,email',
-            'educationPrograms:id,code,name_ar',
+            ...$this->schoolRelations(),
         ])->loadCount([
             'students',
             'users as teachers_count' => fn (Builder $query) => $query->whereHas(
@@ -215,6 +210,10 @@ class SchoolService
 
     private function syncEducationPrograms(School $school, array $data): void
     {
+        if (! $this->hasSchoolProgramPivot()) {
+            return;
+        }
+
         $programNames = null;
 
         if (array_key_exists('program_types', $data)) {
@@ -286,5 +285,30 @@ class SchoolService
     private function generateSchoolSlug(int $schoolId, string $stage): string
     {
         return Str::lower($this->generateSchoolCode($schoolId, $stage));
+    }
+
+    private function schoolRelations(): array
+    {
+        $relations = [
+            'principal:id,full_name,email',
+            'supervisor:id,full_name,email',
+        ];
+
+        if ($this->hasSchoolProgramPivot()) {
+            $relations[] = 'educationPrograms:id,code,name_ar';
+        }
+
+        return $relations;
+    }
+
+    private function hasSchoolProgramPivot(): bool
+    {
+        static $exists = null;
+
+        if ($exists === null) {
+            $exists = Schema::hasTable('education_program_school');
+        }
+
+        return $exists;
     }
 }
