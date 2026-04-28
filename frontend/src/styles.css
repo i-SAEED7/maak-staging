@@ -3459,6 +3459,7 @@ body.portal-home-active .portal-hero {
   min-height: 100vh;
   display: grid;
   place-items: center;
+  position: relative;
   padding: 170px 24px 90px;
   border: 0;
   border-radius: 0;
@@ -3539,7 +3540,7 @@ body.portal-home-active .portal-hero-action {
 body.portal-home-active .portal-slider-controls {
   position: absolute;
   right: 50%;
-  bottom: 12vh;
+  bottom: clamp(132px, 20vh, 180px);
   transform: translateX(50%);
   display: flex;
   width: auto;
