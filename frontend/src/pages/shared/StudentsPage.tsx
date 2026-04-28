@@ -1,6 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { DataTable, type DataColumn } from "../../components/common/DataTable";
+import { studentFormSchema } from "../../lib/formSchemas";
 import { getErrorMessage } from "../../services/api";
 import {
   educationProgramService,
@@ -90,7 +93,19 @@ export function StudentsPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [programs, setPrograms] = useState<EducationProgramOption[]>([]);
   const [schools, setSchools] = useState<SchoolOption[]>([]);
-  const [formValues, setFormValues] = useState<StudentFormValues>(defaultFormValues);
+  const {
+    formState: { errors: formErrors },
+    getValues,
+    handleSubmit,
+    register,
+    reset,
+    setValue,
+    watch
+  } = useForm<StudentFormValues>({
+    defaultValues: defaultFormValues,
+    resolver: zodResolver(studentFormSchema)
+  });
+  const formValues = watch();
 
   const selectedSchool = schools.find((school) => String(school.id) === formValues.school_id) ?? null;
   const gradeOptions = buildGradeOptions(selectedSchool?.stage);
@@ -164,19 +179,17 @@ export function StudentsPage() {
             stage: school.stage
           }));
           setSchools(mappedSchools);
-          setFormValues((current) => ({
-            ...current,
-            school_id: current.school_id || selectedSchoolId || String(mappedSchools[0]?.id ?? "")
-          }));
+          if (!getValues("school_id")) {
+            setValue("school_id", selectedSchoolId || String(mappedSchools[0]?.id ?? ""));
+          }
 
           return;
         }
 
         setSchools(fallbackSchools);
-        setFormValues((current) => ({
-          ...current,
-          school_id: current.school_id || selectedSchoolId || String(fallbackSchools[0]?.id ?? "")
-        }));
+        if (!getValues("school_id")) {
+          setValue("school_id", selectedSchoolId || String(fallbackSchools[0]?.id ?? ""));
+        }
       } catch (loadError) {
         setError(getErrorMessage(loadError));
       }
@@ -208,52 +221,47 @@ export function StudentsPage() {
 
           <form
             className="page-stack"
-            onSubmit={async (event) => {
-              event.preventDefault();
+            onSubmit={handleSubmit(async (values) => {
               setSaving(true);
               setError(null);
               setSuccessMessage(null);
 
               try {
                 await studentService.create({
-                  school_id: formValues.school_id ? Number(formValues.school_id) : undefined,
-                  education_program_id: formValues.education_program_id
-                    ? Number(formValues.education_program_id)
+                  school_id: values.school_id ? Number(values.school_id) : undefined,
+                  education_program_id: values.education_program_id
+                    ? Number(values.education_program_id)
                     : undefined,
-                  first_name: formValues.first_name.trim(),
-                  family_name: formValues.family_name.trim(),
-                  gender: formValues.gender,
-                  grade_level: formValues.grade_level.trim() || undefined,
-                  classroom: formValues.classroom.trim() || undefined
+                  first_name: values.first_name.trim(),
+                  family_name: values.family_name.trim(),
+                  gender: values.gender,
+                  grade_level: values.grade_level.trim() || undefined,
+                  classroom: values.classroom.trim() || undefined
                 });
 
                 setSuccessMessage("تمت إضافة الطالب بنجاح، وتم توليد رقمه تلقائيًا.");
-                setFormValues((current) => ({
+                reset({
                   ...defaultFormValues,
-                  school_id: current.school_id,
-                  gender: current.gender
-                }));
+                  school_id: values.school_id,
+                  gender: values.gender
+                });
                 await loadStudents();
               } catch (saveError) {
                 setError(getErrorMessage(saveError));
               } finally {
                 setSaving(false);
               }
-            }}
+            })}
           >
             <div className="grid-two">
               <label className="field">
                 <span>المدرسة</span>
                 <select
-                  onChange={(event) => {
-                    setFormValues((current) => ({
-                      ...current,
-                      school_id: event.target.value,
-                      grade_level: ""
-                    }));
-                  }}
                   required
                   value={formValues.school_id}
+                  {...register("school_id", {
+                    onChange: () => setValue("grade_level", "")
+                  })}
                 >
                   <option value="">اختر المدرسة</option>
                   {schools.map((school) => (
@@ -262,19 +270,15 @@ export function StudentsPage() {
                     </option>
                   ))}
                 </select>
+                {formErrors.school_id ? <small className="field-hint">{formErrors.school_id.message}</small> : null}
               </label>
 
               <label className="field">
                 <span>نوع البرنامج</span>
                 <select
-                  onChange={(event) =>
-                    setFormValues((current) => ({
-                      ...current,
-                      education_program_id: event.target.value
-                    }))
-                  }
                   required
                   value={formValues.education_program_id}
+                  {...register("education_program_id")}
                 >
                   <option value="">اختر البرنامج</option>
                   {programs.map((program) => (
@@ -283,6 +287,7 @@ export function StudentsPage() {
                     </option>
                   ))}
                 </select>
+                {formErrors.education_program_id ? <small className="field-hint">{formErrors.education_program_id.message}</small> : null}
               </label>
             </div>
 
@@ -290,19 +295,19 @@ export function StudentsPage() {
               <label className="field">
                 <span>الاسم الأول</span>
                 <input
-                  onChange={(event) => setFormValues((current) => ({ ...current, first_name: event.target.value }))}
                   required
-                  value={formValues.first_name}
+                  {...register("first_name")}
                 />
+                {formErrors.first_name ? <small className="field-hint">{formErrors.first_name.message}</small> : null}
               </label>
 
               <label className="field">
                 <span>اسم العائلة</span>
                 <input
-                  onChange={(event) => setFormValues((current) => ({ ...current, family_name: event.target.value }))}
                   required
-                  value={formValues.family_name}
+                  {...register("family_name")}
                 />
+                {formErrors.family_name ? <small className="field-hint">{formErrors.family_name.message}</small> : null}
               </label>
             </div>
 
@@ -310,13 +315,8 @@ export function StudentsPage() {
               <label className="field">
                 <span>الجنس</span>
                 <select
-                  onChange={(event) =>
-                    setFormValues((current) => ({
-                      ...current,
-                      gender: event.target.value as "male" | "female"
-                    }))
-                  }
                   value={formValues.gender}
+                  {...register("gender")}
                 >
                   <option value="male">ذكر</option>
                   <option value="female">أنثى</option>
@@ -326,8 +326,8 @@ export function StudentsPage() {
               <label className="field">
                 <span>الصف</span>
                 <select
-                  onChange={(event) => setFormValues((current) => ({ ...current, grade_level: event.target.value }))}
                   value={formValues.grade_level}
+                  {...register("grade_level")}
                 >
                   <option value="">اختر الصف</option>
                   {gradeOptions.map((grade) => (
@@ -336,14 +336,14 @@ export function StudentsPage() {
                     </option>
                   ))}
                 </select>
+                {formErrors.grade_level ? <small className="field-hint">{formErrors.grade_level.message}</small> : null}
               </label>
             </div>
 
             <label className="field">
               <span>الفصل</span>
               <input
-                onChange={(event) => setFormValues((current) => ({ ...current, classroom: event.target.value }))}
-                value={formValues.classroom}
+                {...register("classroom")}
               />
             </label>
 

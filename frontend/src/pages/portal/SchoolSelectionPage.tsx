@@ -41,7 +41,7 @@ export function SchoolSelectionPage() {
             >
               <span className="portal-chip">{school.program_type ?? "برنامج"}</span>
               <h3>{school.name_ar}</h3>
-              <p>{school.stage ?? "مرحلة غير محددة"} | {school.school_code ?? "-"}</p>
+              <p>{school.stage ?? "مرحلة غير محددة"}</p>
             </button>
           ))}
         </div>

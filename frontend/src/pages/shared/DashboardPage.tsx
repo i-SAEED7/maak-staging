@@ -1,9 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { getErrorMessage } from "../../services/api";
 import { dashboardService, type DashboardSummary } from "../../services/dashboardService";
 import { useAuthStore } from "../../stores/authStore";
 import { getRoleLabel } from "../../lib/uiText";
+
+const DashboardChart = lazy(() =>
+  import("../../components/dashboard/DashboardChart").then((module) => ({ default: module.DashboardChart }))
+);
 
 type StatCardDefinition = {
   key: string;
@@ -147,6 +151,14 @@ export function DashboardPage() {
     }
   }
 
+  const chartData = summary
+    ? [
+        { name: "المدارس", value: summary.schools_count },
+        { name: "الطلاب", value: summary.students_count },
+        { name: "البرامج", value: summary.programs_count }
+      ]
+    : [];
+
   return (
     <div className="page-stack">
       <section className="hero-card">
@@ -161,7 +173,7 @@ export function DashboardPage() {
         </p>
         <div className="chip-row">
           <span className="chip">الدور: {getRoleLabel(user?.role)}</span>
-          {!isSuperAdmin ? <span className="chip">رقم المدرسة: {selectedSchool?.school_code ?? user?.school?.school_code ?? "-"}</span> : null}
+          {!isSuperAdmin ? <span className="chip">المدرسة: {selectedSchool?.name_ar ?? user?.school?.name_ar ?? "-"}</span> : null}
           <span className="chip">عدد الصلاحيات: {permissions.length}</span>
         </div>
       </section>
@@ -246,6 +258,21 @@ export function DashboardPage() {
               </div>
             ))}
           </div>
+        </section>
+      ) : null}
+
+      {summary ? (
+        <section className="surface-card page-stack">
+          <div className="page-header">
+            <div>
+              <span className="eyebrow">المخططات</span>
+              <h3>ملخص بصري سريع</h3>
+            </div>
+          </div>
+
+          <Suspense fallback={<div className="loading-box">جارٍ تحميل المخطط...</div>}>
+            <DashboardChart data={chartData} />
+          </Suspense>
         </section>
       ) : null}
 

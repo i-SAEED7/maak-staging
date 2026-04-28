@@ -28,10 +28,6 @@ export function SchoolContactPage() {
                 <span className="detail-label">البرنامج</span>
                 <strong>{school.program_type ?? "-"}</strong>
               </div>
-              <div className="detail-list-item">
-                <span className="detail-label">كود المدرسة</span>
-                <strong>{school.school_code ?? school.official_code ?? "-"}</strong>
-              </div>
             </div>
           </article>
 

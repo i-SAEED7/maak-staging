@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, NavLink, Navigate, Outlet, useNavigate, useParams } from "react-router-dom";
+import ministryLogo from "../../assets/images/ministry-logo.png";
 import { resolvePostLoginPath } from "../../lib/postLogin";
 import {
   buildAccessibleSchools,
   resolveSchoolPath,
-  translateRole,
   type SchoolSiteContextValue,
   type SchoolSiteStats
 } from "../../lib/schoolSite";
@@ -111,9 +111,7 @@ export function SchoolSiteLayout() {
   const canViewPlans = permissions.includes("*") || permissions.includes("iep.view") || permissions.includes("iep.view_any");
   const navItems: SchoolSiteNavItem[] = [
     { to: schoolPath, label: "الرئيسية" },
-    { to: `${schoolPath}/programs`, label: "البرامج" },
-    ...(canAccessFiles ? [{ to: `${schoolPath}/files`, label: "الملفات" }] : []),
-    ...(canViewAnnouncements ? [{ to: `${schoolPath}/announcements`, label: "الإعلانات" }] : []),
+    { to: "/about", label: "عن القسم" },
     { to: `${schoolPath}/services`, label: "الخدمات" },
     { to: `${schoolPath}/contact`, label: "تواصل معنا" }
   ];
@@ -145,23 +143,39 @@ export function SchoolSiteLayout() {
 
   return (
     <div className="portal-page-stack">
-      <section className="portal-surface school-site-layout">
-        <div className="school-site-head">
-          <div className="school-site-intro">
-            <span className="portal-eyebrow">موقع المدرسة</span>
-            <h2>{school.name}</h2>
-            <p>
-              {school.stage ?? "مرحلة غير محددة"} | {school.program_type ?? "برنامج غير محدد"}
-            </p>
-            <div className="chip-row">
-              <span className="chip">{translateRole(role)}</span>
-              <span className="chip">{school.school_code ?? school.official_code ?? "-"}</span>
+      <section className="school-gateway-header-shell">
+        <div className="school-gateway-header">
+          <div className="school-gateway-brand">
+            <img
+              alt="شعار وزارة التعليم"
+              className="school-gateway-logo"
+              onError={(event) => {
+                event.currentTarget.style.display = "none";
+              }}
+              src={ministryLogo}
+            />
+            <div>
+              <strong>بوابة معاك</strong>
+              <span>{school.name}</span>
             </div>
           </div>
 
-          <div className="portal-button-row">
+          <nav className="school-gateway-nav">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                className={({ isActive }) => `school-gateway-nav-link${isActive ? " is-active" : ""}`}
+                end={item.to === schoolPath}
+                to={item.to}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="school-gateway-actions">
             <Link className="portal-button portal-button-primary" to="/app">
-              الدخول إلى النظام المركزي
+              الدخول إلى النظام
             </Link>
             {role === "supervisor" && accessibleSchools.length > 1 ? (
               <Link className="portal-button portal-button-secondary" to="/select-school">
@@ -179,34 +193,6 @@ export function SchoolSiteLayout() {
             </button>
           </div>
         </div>
-
-        <div className="school-site-meta-grid">
-          <article className="portal-stat-card">
-            <span>كود المدرسة</span>
-            <strong>{school.school_code ?? school.official_code ?? "-"}</strong>
-          </article>
-          <article className="portal-stat-card">
-            <span>المدير</span>
-            <strong>{school.principal?.full_name ?? "غير محدد"}</strong>
-          </article>
-          <article className="portal-stat-card">
-            <span>المشرف</span>
-            <strong>{school.supervisor?.full_name ?? "غير محدد"}</strong>
-          </article>
-        </div>
-
-        <nav className="school-site-nav">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              className={({ isActive }) => `school-site-nav-link${isActive ? " is-active" : ""}`}
-              end={item.to === schoolPath}
-              to={item.to}
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
       </section>
 
       {error ? <div className="error-box">{error}</div> : null}

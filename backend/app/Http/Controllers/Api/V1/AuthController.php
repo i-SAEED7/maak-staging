@@ -6,9 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Exceptions\AuthPortalException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CentralLoginRequest;
 use App\Http\Requests\LoginRequest;
-use App\Http\Requests\SchoolLoginRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use App\Support\PermissionResolver;
@@ -32,28 +30,6 @@ class AuthController extends Controller
         }
 
         return $this->successResponse($result, 'تم تسجيل الدخول');
-    }
-
-    public function centralLogin(CentralLoginRequest $request): JsonResponse
-    {
-        try {
-            $result = $this->authService->loginCentral($request->validated(), $request);
-        } catch (AuthPortalException $exception) {
-            return $this->errorResponse($exception);
-        }
-
-        return $this->successResponse($result, 'تم تسجيل الدخول المركزي');
-    }
-
-    public function schoolLogin(SchoolLoginRequest $request): JsonResponse
-    {
-        try {
-            $result = $this->authService->loginSchool($request->validated(), $request);
-        } catch (AuthPortalException $exception) {
-            return $this->errorResponse($exception);
-        }
-
-        return $this->successResponse($result, 'تم تسجيل الدخول المدرسي');
     }
 
     public function logout(Request $request): JsonResponse

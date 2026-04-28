@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\RoleName;
+use App\Models\EducationProgram;
 use App\Models\School;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,6 +29,7 @@ class SchoolService
             ->with([
                 'principal:id,full_name,email',
                 'supervisor:id,full_name,email',
+                'educationPrograms:id,code,name_ar',
             ])
             ->withCount('students')
             ->withCount([
@@ -49,7 +51,7 @@ class SchoolService
             })
             ->when($filters['name'] ?? null, fn ($query, $value) => $query->where('name_ar', 'like', '%' . $value . '%'))
             ->when($filters['status'] ?? null, fn ($query, $value) => $query->where('status', $value))
-            ->when($filters['program_type'] ?? null, fn ($query, $value) => $query->where('program_type', $value))
+            ->when($filters['program_type'] ?? null, fn ($query, $value) => $query->where('program_type', 'like', '%' . $value . '%'))
             ->when($filters['stage'] ?? null, fn ($query, $value) => $query->where('stage', $value))
             ->when($filters['gender'] ?? null, fn ($query, $value) => $query->where('gender', $value))
             ->when($actor !== null, fn (Builder $query) => $this->tenantService->scopeAccessibleSchools($query, $actor, 'id'))
@@ -73,6 +75,7 @@ class SchoolService
             'ministry_code' => $school->ministry_code ?: $this->generateSchoolCode((int) $school->id, (string) $school->stage),
         ])->save();
         $this->syncSupervisorAssignment($school, $school->supervisor_id);
+        $this->syncEducationPrograms($school, $data);
 
         return $this->load($school);
     }
@@ -81,6 +84,7 @@ class SchoolService
     {
         $school->update($this->mapPayload($data));
         $this->syncSupervisorAssignment($school, $school->supervisor_id);
+        $this->syncEducationPrograms($school, $data);
 
         return $this->load($school->refresh());
     }
@@ -133,6 +137,7 @@ class SchoolService
         return $school->load([
             'principal:id,full_name,email',
             'supervisor:id,full_name,email',
+            'educationPrograms:id,code,name_ar',
         ])->loadCount([
             'students',
             'users as teachers_count' => fn (Builder $query) => $query->whereHas(
@@ -163,8 +168,10 @@ class SchoolService
             $payload['stage'] = $data['stage'];
         }
 
-        if (array_key_exists('program_type', $data)) {
-            $payload['program_type'] = $data['program_type'];
+        if (array_key_exists('program_types', $data)) {
+            $payload['program_type'] = $this->normalizeProgramNames($data['program_types'])->implode('، ');
+        } elseif (array_key_exists('program_type', $data)) {
+            $payload['program_type'] = $this->normalizeProgramNames($data['program_type'])->implode('، ');
         }
 
         if (array_key_exists('gender', $data)) {
@@ -204,6 +211,46 @@ class SchoolService
         }
 
         return $payload;
+    }
+
+    private function syncEducationPrograms(School $school, array $data): void
+    {
+        $programNames = null;
+
+        if (array_key_exists('program_types', $data)) {
+            $programNames = $this->normalizeProgramNames($data['program_types']);
+        } elseif (array_key_exists('program_type', $data)) {
+            $programNames = $this->normalizeProgramNames($data['program_type']);
+        }
+
+        if ($programNames === null) {
+            return;
+        }
+
+        $programIds = EducationProgram::query()
+            ->whereIn('name_ar', $programNames->all())
+            ->pluck('id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->all();
+
+        $school->educationPrograms()->sync($programIds);
+    }
+
+    private function normalizeProgramNames(mixed $programNames): \Illuminate\Support\Collection
+    {
+        if (is_string($programNames)) {
+            $programNames = preg_split('/،|,/', $programNames) ?: [];
+        }
+
+        if (! is_array($programNames)) {
+            return collect();
+        }
+
+        return collect($programNames)
+            ->map(static fn (mixed $programName): string => trim((string) $programName))
+            ->filter()
+            ->unique()
+            ->values();
     }
 
     private function syncSupervisorAssignment(School $school, ?int $supervisorUserId): void

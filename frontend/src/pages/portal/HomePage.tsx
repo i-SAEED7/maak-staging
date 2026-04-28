@@ -33,8 +33,16 @@ export function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    document.body.classList.add("portal-home-active");
+
+    return () => {
+      document.body.classList.remove("portal-home-active");
+    };
+  }, []);
+
   return (
-    <div className="portal-page-stack">
+    <div className="portal-page-stack portal-home-page">
       <section className="portal-hero">
         <AnnouncementSlider slides={heroSlides} />
       </section>

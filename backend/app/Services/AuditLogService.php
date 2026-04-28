@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 final class AuditLogService
 {
@@ -22,6 +23,7 @@ final class AuditLogService
 
         return AuditLog::query()
             ->with(['actor.role', 'school'])
+            ->where('created_at', '>=', now()->subMonths(3))
             ->when($actor->role?->name !== 'super_admin', function ($query) use ($actor): void {
                 $schoolIds = $this->tenantService->accessibleSchoolIds($actor);
 
@@ -50,5 +52,43 @@ final class AuditLogService
             ->latest('created_at')
             ->latest('id')
             ->paginate($perPage);
+    }
+
+    public function archiveOlderThanThreeMonths(int $chunkSize = 500): int
+    {
+        $archivedCount = 0;
+        $cutoff = now()->subMonths(3);
+
+        AuditLog::query()
+            ->where('created_at', '<', $cutoff)
+            ->orderBy('id')
+            ->chunkById($chunkSize, function ($logs) use (&$archivedCount): void {
+                DB::transaction(function () use ($logs, &$archivedCount): void {
+                    $rows = $logs->map(static fn (AuditLog $log): array => [
+                        'original_audit_log_id' => $log->id,
+                        'school_id' => $log->school_id,
+                        'user_id' => $log->user_id,
+                        'action' => $log->action,
+                        'target_type' => $log->target_type,
+                        'target_id' => $log->target_id,
+                        'method' => $log->method,
+                        'endpoint' => $log->endpoint,
+                        'ip_address' => $log->ip_address,
+                        'user_agent' => $log->user_agent,
+                        'old_values' => $log->old_values !== null ? json_encode($log->old_values, JSON_UNESCAPED_UNICODE) : null,
+                        'new_values' => $log->new_values !== null ? json_encode($log->new_values, JSON_UNESCAPED_UNICODE) : null,
+                        'created_at' => $log->created_at,
+                        'archived_at' => now(),
+                    ])->all();
+
+                    if ($rows !== []) {
+                        DB::table('audit_log_archives')->insert($rows);
+                        AuditLog::query()->whereIn('id', $logs->pluck('id')->all())->delete();
+                        $archivedCount += count($rows);
+                    }
+                });
+            });
+
+        return $archivedCount;
     }
 }

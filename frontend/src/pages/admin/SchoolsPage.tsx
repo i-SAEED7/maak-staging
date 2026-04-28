@@ -14,7 +14,7 @@ import { useAuthStore } from "../../stores/authStore";
 type SchoolFormValues = {
   name: string;
   stage: string;
-  program_type: string;
+  program_types: string[];
   location_lat: string;
   location_lng: string;
   principal_id: string;
@@ -27,7 +27,7 @@ const GENDER_OPTIONS = ["", "بنين", "بنات", "غير محدد"];
 const defaultFormValues: SchoolFormValues = {
   name: "",
   stage: STAGE_OPTIONS[0],
-  program_type: "",
+  program_types: [],
   location_lat: "",
   location_lng: "",
   principal_id: "",
@@ -42,10 +42,17 @@ const initialMeta: PaginatedMeta = {
 };
 
 function toFormValues(school: SchoolItem): SchoolFormValues {
+  const programTypes = school.program_types?.length
+    ? school.program_types
+    : (school.program_type ?? "")
+        .split(/،|,/)
+        .map((program) => program.trim())
+        .filter(Boolean);
+
   return {
     name: school.name ?? "",
     stage: school.stage ?? STAGE_OPTIONS[0],
-    program_type: school.program_type ?? "",
+    program_types: programTypes,
     location_lat: school.location_lat === null ? "" : String(school.location_lat),
     location_lng: school.location_lng === null ? "" : String(school.location_lng),
     principal_id: school.principal_id === null ? "" : String(school.principal_id),
@@ -57,7 +64,8 @@ function toPayload(values: SchoolFormValues): SchoolFormPayload {
   return {
     name: values.name.trim(),
     stage: values.stage,
-    program_type: values.program_type,
+    program_type: values.program_types[0] ?? "",
+    program_types: values.program_types,
     location_lat: values.location_lat.trim() === "" ? null : values.location_lat.trim(),
     location_lng: values.location_lng.trim() === "" ? null : values.location_lng.trim(),
     principal_id: values.principal_id ? Number(values.principal_id) : null,
@@ -98,6 +106,10 @@ export function SchoolsPage() {
   const [tableError, setTableError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const buildDefaultFormValues = () => ({
+    ...defaultFormValues,
+    program_types: programOptions[0]?.name_ar ? [programOptions[0].name_ar] : []
+  });
 
   useEffect(() => {
     if (!isSuperAdmin) {
@@ -119,7 +131,7 @@ export function SchoolsPage() {
         setProgramOptions(programs);
         setFormValues((current) => ({
           ...current,
-          program_type: current.program_type || programs[0]?.name_ar || ""
+          program_types: current.program_types.length ? current.program_types : programs[0]?.name_ar ? [programs[0].name_ar] : []
         }));
       } catch (error) {
         setFormError(getErrorMessage(error));
@@ -282,7 +294,7 @@ export function SchoolsPage() {
           className="button button-primary"
           onClick={() => {
             setEditingSchool(null);
-            setFormValues(defaultFormValues);
+            setFormValues(buildDefaultFormValues());
             setFormError(null);
             setSuccessMessage(null);
           }}
@@ -423,6 +435,12 @@ export function SchoolsPage() {
             setSuccessMessage(null);
 
             try {
+              if (formValues.program_types.length === 0) {
+                setFormError("يجب اختيار برنامج واحد على الأقل.");
+                setSubmitting(false);
+                return;
+              }
+
               const payload = toPayload(formValues);
 
               if (editingSchool) {
@@ -434,7 +452,7 @@ export function SchoolsPage() {
               }
 
               setEditingSchool(null);
-              setFormValues(defaultFormValues);
+              setFormValues(buildDefaultFormValues());
               setPage(1);
 
               const refreshed = await schoolService.list({
@@ -482,18 +500,30 @@ export function SchoolsPage() {
 
             <label className="field">
               <span>نوع البرنامج</span>
-              <select
-                onChange={(event) =>
-                  setFormValues((current) => ({ ...current, program_type: event.target.value }))
-                }
-                value={formValues.program_type}
-              >
-                {programOptions.map((option) => (
-                  <option key={option.id} value={option.name_ar}>
-                    {option.name_ar}
-                  </option>
-                ))}
-              </select>
+              <div className="selection-list selection-list-compact">
+                {programOptions.map((option) => {
+                  const isChecked = formValues.program_types.includes(option.name_ar);
+
+                  return (
+                    <label className="selection-option" key={option.id}>
+                      <input
+                        checked={isChecked}
+                        onChange={(event) => {
+                          setFormValues((current) => ({
+                            ...current,
+                            program_types: event.target.checked
+                              ? Array.from(new Set([...current.program_types, option.name_ar]))
+                              : current.program_types.filter((programName) => programName !== option.name_ar)
+                          }));
+                        }}
+                        type="checkbox"
+                      />
+                      <span>{option.name_ar}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              <small className="field-hint">يمكن اختيار أكثر من برنامج للمدرسة الواحدة.</small>
             </label>
           </div>
 
@@ -567,7 +597,7 @@ export function SchoolsPage() {
               className="button button-ghost"
               onClick={() => {
                 setEditingSchool(null);
-                setFormValues(defaultFormValues);
+                setFormValues(buildDefaultFormValues());
                 setFormError(null);
               }}
               type="button"

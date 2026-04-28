@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AccessControlController;
+use App\Http\Controllers\Api\V1\AccountApprovalController;
 use App\Http\Controllers\Api\V1\AnnouncementController;
 use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\EducationProgramController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\IepPlanController;
+use App\Http\Controllers\Api\V1\InspirationalQuoteController;
 use App\Http\Controllers\Api\V1\MessageController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\PasswordResetController;
 use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\SchoolController;
 use App\Http\Controllers\Api\V1\StudentController;
@@ -21,22 +24,23 @@ use App\Http\Controllers\Api\PortalController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
-Route::prefix('auth')->group(function (): void {
-    Route::post('school-login', [AuthController::class, 'schoolLogin']);
-    Route::post('central-login', [AuthController::class, 'centralLogin']);
-});
+Route::post('forgot-password', [PasswordResetController::class, 'forgot']);
+Route::post('reset-password', [PasswordResetController::class, 'reset']);
+Route::post('account-approval-requests', [AccountApprovalController::class, 'store']);
 Route::prefix('portal')->group(function (): void {
     Route::get('programs', [PortalController::class, 'programs']);
     Route::get('schools', [PortalController::class, 'schools']);
+    Route::get('inspirational-quotes', [PortalController::class, 'inspirationalQuotes']);
     Route::get('statistics', [PortalController::class, 'statistics']);
 });
 
 Route::prefix('v1')->group(function (): void {
     Route::prefix('auth')->group(function (): void {
         Route::post('login', [AuthController::class, 'login']);
-        Route::post('school-login', [AuthController::class, 'schoolLogin']);
-        Route::post('central-login', [AuthController::class, 'centralLogin']);
     });
+    Route::post('forgot-password', [PasswordResetController::class, 'forgot']);
+    Route::post('reset-password', [PasswordResetController::class, 'reset']);
+    Route::post('account-approval-requests', [AccountApprovalController::class, 'store']);
 
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('auth/logout', [AuthController::class, 'logout']);
@@ -51,6 +55,9 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('users', UserController::class);
         Route::patch('users/{user}/status', [UserController::class, 'changeStatus']);
         Route::post('users/{user}/schools', [UserController::class, 'assignSchools']);
+        Route::get('account-approvals', [AccountApprovalController::class, 'index']);
+        Route::put('account-approvals/{accountApproval}', [AccountApprovalController::class, 'update']);
+        Route::post('account-approvals/{accountApproval}/approve', [AccountApprovalController::class, 'approve']);
         Route::get('access-control/roles', [AccessControlController::class, 'roles']);
         Route::get('access-control/roles/{role}/users', [AccessControlController::class, 'roleUsers']);
         Route::get('access-control/permissions', [AccessControlController::class, 'permissions']);
@@ -62,6 +69,9 @@ Route::prefix('v1')->group(function (): void {
         Route::post('education-programs', [EducationProgramController::class, 'store']);
         Route::put('education-programs/{educationProgram}', [EducationProgramController::class, 'update']);
         Route::delete('education-programs/{educationProgram}', [EducationProgramController::class, 'destroy']);
+        Route::apiResource('inspirational-quotes', InspirationalQuoteController::class)
+            ->parameters(['inspirational-quotes' => 'inspirationalQuote'])
+            ->only(['index', 'store', 'update', 'destroy']);
 
         Route::get('reports/schools/{school}/summary', [ReportController::class, 'schoolSummary']);
         Route::get('reports/students/{student}/summary', [ReportController::class, 'studentSummary']);

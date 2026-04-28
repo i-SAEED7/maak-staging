@@ -5,7 +5,7 @@ export function canAccessRoute(
   path: string,
   routeMap: Record<string, string[]> = {},
 ) {
-  if (path === "/login" || path === "/forgot-password" || path === "/unauthorized") {
+  if (path === "/login" || path === "/register" || path === "/reset-password" || path === "/unauthorized") {
     return true;
   }
 

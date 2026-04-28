@@ -1,43 +1,55 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import {
+  Bell,
+  BarChart3,
+  FileText,
+  GraduationCap,
+  LayoutDashboard,
+  LogOut,
+  Megaphone,
+  MessageSquare,
+  NotebookTabs,
+  Quote,
+  RotateCcw,
+  School,
+  Archive,
+  FolderKanban,
+  UserCheck,
+  Users
+} from "lucide-react";
+import { cn } from "../../lib/utils";
 import { useAuthStore } from "../../stores/authStore";
 import { getRoleLabel } from "../../lib/uiText";
 
 type NavItem = {
   to: string;
   label: string;
-  icon?: "school";
+  icon: "dashboard" | "school" | "users" | "approvals" | "programs" | "quotes" | "announcements" | "audit" | "students" | "iep" | "messages" | "reports" | "files" | "teacherPortfolio";
 };
 
-function NavItemIcon({ icon }: { icon?: NavItem["icon"] }) {
-  if (icon !== "school") {
-    return null;
-  }
+const navIcons: Record<NavItem["icon"], typeof LayoutDashboard> = {
+  dashboard: LayoutDashboard,
+  school: School,
+  users: Users,
+  approvals: UserCheck,
+  programs: NotebookTabs,
+  quotes: Quote,
+  announcements: Megaphone,
+  audit: Bell,
+  students: GraduationCap,
+  iep: FileText,
+  messages: MessageSquare,
+  reports: BarChart3,
+  files: Archive,
+  teacherPortfolio: FolderKanban
+};
+
+function NavItemIcon({ icon }: { icon: NavItem["icon"] }) {
+  const Icon = navIcons[icon];
 
   return (
     <span aria-hidden="true" className="nav-link-icon">
-      <svg fill="none" height="18" viewBox="0 0 24 24" width="18">
-        <path
-          d="M4 10.5 12 6l8 4.5"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.8"
-        />
-        <path
-          d="M6 11.5V18h12v-6.5"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.8"
-        />
-        <path
-          d="M10 18v-3h4v3M12 6v12"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.8"
-        />
-      </svg>
+      <Icon size={18} strokeWidth={1.9} />
     </span>
   );
 }
@@ -48,6 +60,7 @@ export function AppShell() {
   const schoolId = useAuthStore((state) => state.schoolId);
   const setSchoolId = useAuthStore((state) => state.setSchoolId);
   const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
   const normalizedRole = (user?.role ?? "").trim().toLowerCase();
   const hasPermission = (permission: string) => permissions.includes("*") || permissions.includes(permission);
   const assignedSchools = user?.assigned_schools ?? [];
@@ -61,9 +74,12 @@ export function AppShell() {
   const canViewStudents = normalizedRole !== "parent" && (hasPermission("students.view") || hasPermission("students.view_any"));
   const canViewPlans = hasPermission("iep.view") || hasPermission("iep.view_any");
   const canViewMessages = hasPermission("messages.view_any") || hasPermission("messages.view_thread");
-  const currentSchoolCode = showSupervisorSchoolSwitcher
-    ? selectedSchool?.school_code ?? selectedSchool?.official_code ?? "-"
-    : user?.school?.school_code ?? "-";
+  const canViewTeacherPortfolio =
+    normalizedRole === "teacher" &&
+    (hasPermission("teacher_portfolios.view") || hasPermission("portfolios.view") || hasPermission("portfolios.view_any"));
+  const currentSchoolName = showSupervisorSchoolSwitcher
+    ? selectedSchool?.name_ar ?? "-"
+    : user?.school?.name_ar ?? "-";
   const currentPortalSchool = showSupervisorSchoolSwitcher
     ? assignedSchools.find((school) => String(school.id) === schoolId) ?? null
     : user?.school ?? null;
@@ -71,17 +87,20 @@ export function AppShell() {
     ? `/schools/${currentPortalSchool.slug ?? currentPortalSchool.id}`
     : null;
   const navItems: NavItem[] = [
-    { to: "/app", label: "الواجهة" },
+    { to: "/app", label: "الواجهة", icon: "dashboard" },
     ...(normalizedRole === "super_admin" ? [{ to: "/app/schools", label: "المدارس", icon: "school" as const }] : []),
-    ...(normalizedRole === "super_admin" ? [{ to: "/app/users", label: "الحسابات والصلاحيات" }] : []),
-    ...(["super_admin", "admin"].includes(normalizedRole) ? [{ to: "/app/programs", label: "أنواع البرامج" }] : []),
-    ...(canViewAnnouncements ? [{ to: "/app/announcements", label: "الإعلانات" }] : []),
-    ...(normalizedRole === "super_admin" ? [{ to: "/app/audit-logs", label: "سجل التعديلات" }] : []),
-    ...(canViewStudents ? [{ to: "/app/students", label: "الطلاب" }] : []),
-    ...(canViewPlans ? [{ to: "/app/iep-plans", label: "الخطط الفردية" }] : []),
-    ...(canViewMessages ? [{ to: "/app/messages", label: "الرسائل" }] : []),
-    ...(canViewReports ? [{ to: "/app/reports", label: "التقارير" }] : []),
-    ...(canViewFiles ? [{ to: "/app/files", label: "الملفات" }] : [])
+    ...(normalizedRole === "super_admin" ? [{ to: "/app/users", label: "الحسابات والصلاحيات", icon: "users" as const }] : []),
+    ...(normalizedRole === "super_admin" ? [{ to: "/app/account-approvals", label: "اعتماد الحسابات", icon: "approvals" as const }] : []),
+    ...(["super_admin", "admin"].includes(normalizedRole) ? [{ to: "/app/programs", label: "أنواع البرامج", icon: "programs" as const }] : []),
+    ...(normalizedRole === "super_admin" ? [{ to: "/app/inspirational-quotes", label: "العبارات الملهمة", icon: "quotes" as const }] : []),
+    ...(canViewAnnouncements ? [{ to: "/app/announcements", label: "الإعلانات", icon: "announcements" as const }] : []),
+    ...(normalizedRole === "super_admin" ? [{ to: "/app/audit-logs", label: "سجل التعديلات", icon: "audit" as const }] : []),
+    ...(canViewStudents ? [{ to: "/app/students", label: "الطلاب", icon: "students" as const }] : []),
+    ...(canViewPlans ? [{ to: "/app/iep-plans", label: "الخطط الفردية", icon: "iep" as const }] : []),
+    ...(canViewMessages ? [{ to: "/app/messages", label: "الرسائل", icon: "messages" as const }] : []),
+    ...(canViewReports ? [{ to: "/app/reports", label: "التقارير", icon: "reports" as const }] : []),
+    ...(canViewFiles ? [{ to: "/app/files", label: "الملفات", icon: "files" as const }] : []),
+    ...(canViewTeacherPortfolio ? [{ to: "/app/teacher-portfolio", label: "ملف إنجاز المعلم", icon: "teacherPortfolio" as const }] : [])
   ];
 
   return (
@@ -115,9 +134,9 @@ export function AppShell() {
 
         {showStaticSchoolInfo ? (
           <div className="context-card">
-            <span className="context-label">رقم المدرسة</span>
-            <strong>{currentSchoolCode}</strong>
-            <small className="context-hint">{user?.school?.name_ar ?? "المدرسة الحالية"}</small>
+            <span className="context-label">المدرسة</span>
+            <strong>{currentSchoolName}</strong>
+            <small className="context-hint">لا يظهر رقم المدرسة إلا للسوبر أدمن.</small>
           </div>
         ) : null}
 
@@ -126,7 +145,7 @@ export function AppShell() {
             <NavLink
               key={item.to}
               className={({ isActive }) =>
-                `nav-link${isActive ? " nav-link-active" : ""}`
+                cn("nav-link", isActive && "nav-link-active")
               }
               to={item.to}
             >
@@ -140,11 +159,20 @@ export function AppShell() {
 
         {schoolPortalHref ? (
           <Link className="button button-secondary" to={schoolPortalHref}>
+            <RotateCcw size={18} />
             العودة إلى بوابة المدرسة
           </Link>
         ) : null}
 
-        <button className="button button-secondary" onClick={() => void logout()} type="button">
+        <button
+          className="button button-secondary"
+          onClick={async () => {
+            await logout();
+            navigate("/?login=1", { replace: true });
+          }}
+          type="button"
+        >
+          <LogOut size={18} />
           تسجيل الخروج
         </button>
       </aside>

@@ -135,7 +135,7 @@ export function FilesPage() {
       const payload = await fileService.temporaryLink(file.id, 30);
       setPreviewState({
         file,
-        url: payload.temporary_link.url,
+        url: payload.temporary_link.preview_url ?? payload.temporary_link.url,
         expiresAt: payload.temporary_link.expires_at
       });
       setError(null);
@@ -155,7 +155,11 @@ export function FilesPage() {
   };
 
   const columns: DataColumn<FileItem>[] = [
-    { key: "name", label: "الاسم", render: (row) => row.original_name },
+    {
+      key: "name",
+      label: "الاسم",
+      render: (row) => <span className="file-name-cell" title={row.original_name}>{row.original_name}</span>
+    },
     { key: "school", label: "المدرسة", render: (row) => row.school?.name_ar ?? "-" },
     { key: "category", label: "الفئة", render: (row) => translateFileCategory(row.category) },
     { key: "uploader", label: "اسم رافع الملف", render: (row) => row.uploader?.full_name ?? "-" },

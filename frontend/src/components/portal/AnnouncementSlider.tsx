@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 type AnnouncementSlide = {
   title: string;
@@ -33,9 +34,17 @@ export function AnnouncementSlider({ slides }: AnnouncementSliderProps) {
   return (
     <section className="portal-hero-slider">
       <div className="portal-hero-copy">
-        <span className="portal-hero-label">قسم ذوي الإعاقة</span>
+        <span className="portal-hero-label">بوابة معاك</span>
         <h1>{slide.title}</h1>
         <p>{slide.text}</p>
+        <div className="portal-hero-actions">
+          <Link className="portal-hero-action" to="/services">
+            استكشف النظام
+          </Link>
+          <Link className="portal-hero-action" to="/map">
+            الخريطة التفاعلية
+          </Link>
+        </div>
       </div>
 
       <div className="portal-slider-controls">
@@ -48,6 +57,11 @@ export function AnnouncementSlider({ slides }: AnnouncementSliderProps) {
             type="button"
           />
         ))}
+      </div>
+
+      <div className="portal-hero-scroll-hint" aria-hidden="true">
+        <span>مرر للأسفل لاكتشاف المزيد</span>
+        <span className="portal-hero-scroll-arrow">↓</span>
       </div>
     </section>
   );

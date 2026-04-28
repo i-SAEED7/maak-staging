@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAuditTargetLabel } from "../../lib/uiText";
+import { getAuditTargetLabel, getRoleLabel } from "../../lib/uiText";
 import { DataTable, type DataColumn } from "../../components/common/DataTable";
 import { getErrorMessage } from "../../services/api";
 import { auditLogService, type AuditLogItem } from "../../services/auditLogService";
@@ -13,17 +13,6 @@ const actionLabels: Record<string, string> = {
   send: "إرسال"
 };
 
-const columns: DataColumn<AuditLogItem>[] = [
-  { key: "actor", label: "من قام بالعملية", render: (row) => row.actor?.full_name ?? "-" },
-  { key: "action", label: "نوع العملية", render: (row) => actionLabels[row.action] ?? row.action },
-  {
-    key: "target",
-    label: "العنصر المتأثر",
-    render: (row) => `${getAuditTargetLabel(row.target_type)}${row.target_id ? ` #${row.target_id}` : ""}`
-  },
-  { key: "date", label: "التاريخ والوقت", render: (row) => new Date(row.created_at).toLocaleString("ar-SA") }
-];
-
 export function AuditLogsPage() {
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = user?.role === "super_admin";
@@ -32,6 +21,29 @@ export function AuditLogsPage() {
   const [actionFilter, setActionFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedActor, setSelectedActor] = useState<AuditLogItem["actor"] | null>(null);
+
+  const columns: DataColumn<AuditLogItem>[] = [
+    {
+      key: "actor",
+      label: "من قام بالعملية",
+      render: (row) =>
+        row.actor ? (
+          <button className="link-button" onClick={() => setSelectedActor(row.actor ?? null)} type="button">
+            {row.actor.full_name}
+          </button>
+        ) : (
+          "-"
+        )
+    },
+    { key: "action", label: "نوع العملية", render: (row) => actionLabels[row.action] ?? row.action },
+    {
+      key: "target",
+      label: "العنصر المتأثر",
+      render: (row) => `${getAuditTargetLabel(row.target_type)}${row.target_id ? ` #${row.target_id}` : ""}`
+    },
+    { key: "date", label: "التاريخ والوقت", render: (row) => new Date(row.created_at).toLocaleString("ar-SA") }
+  ];
 
   useEffect(() => {
     if (!isSuperAdmin) {
@@ -94,6 +106,36 @@ export function AuditLogsPage() {
       {error ? <div className="error-box">{error}</div> : null}
       {loading ? <div className="loading-box">جارٍ تحميل سجل التعديلات...</div> : null}
       {!loading ? <DataTable columns={columns} rows={rows} emptyMessage="لا توجد عمليات مسجلة بعد." /> : null}
+
+      {selectedActor ? (
+        <div className="modal-backdrop" role="presentation">
+          <section aria-modal="true" className="modal-card modal-card-narrow" role="dialog">
+            <div className="page-header">
+              <div>
+                <span className="eyebrow">بيانات الحساب</span>
+                <h3>{selectedActor.full_name}</h3>
+              </div>
+              <button className="button button-ghost" onClick={() => setSelectedActor(null)} type="button">
+                إغلاق
+              </button>
+            </div>
+            <div className="details-grid">
+              <div>
+                <span className="detail-label">الاسم</span>
+                <strong>{selectedActor.full_name}</strong>
+              </div>
+              <div>
+                <span className="detail-label">البريد</span>
+                <strong>{selectedActor.email ?? "-"}</strong>
+              </div>
+              <div>
+                <span className="detail-label">الدور</span>
+                <strong>{getRoleLabel(selectedActor.role)}</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -49,23 +49,18 @@ export const authService = {
 
     return response.data;
   },
-  loginCentral: async (identifier: string, password: string) => {
-    const response = await apiClient.post<LoginResponse>(
-      "/api/auth/central-login",
-      { identifier, password },
-      false
-    );
-
-    return response.data;
+  forgotPassword: async (email: string) => {
+    const response = await apiClient.post<null>("/api/forgot-password", { email }, false);
+    return response.message;
   },
-  loginSchool: async (identifier: string, password: string, schoolCode: string) => {
-    const response = await apiClient.post<LoginResponse>(
-      "/api/auth/school-login",
-      { identifier, password, school_code: schoolCode },
-      false
-    );
-
-    return response.data;
+  resetPassword: async (payload: {
+    email: string;
+    token: string;
+    password: string;
+    password_confirmation: string;
+  }) => {
+    const response = await apiClient.post<null>("/api/reset-password", payload, false);
+    return response.message;
   },
   me: async () => {
     const response = await apiClient.get<MeResponse>("/api/v1/auth/me");

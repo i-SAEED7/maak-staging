@@ -15,6 +15,7 @@ class SchoolResource extends JsonResource
         $supervisor = $this->relationLoaded('supervisor') ? $this->supervisor : null;
         $locationLat = $this->location_lat ?? $this->latitude;
         $locationLng = $this->location_lng ?? $this->longitude;
+        $canViewSchoolCode = $request->user()?->role?->name === 'super_admin';
 
         return [
             'id' => $this->id,
@@ -22,12 +23,27 @@ class SchoolResource extends JsonResource
             'name' => $this->name_ar,
             'name_ar' => $this->name_ar,
             'name_en' => $this->name_en,
-            'school_code' => $this->school_code,
+            'school_code' => $canViewSchoolCode ? $this->school_code : null,
             'slug' => $this->slug,
-            'official_code' => $this->school_code ?: $this->ministry_code,
+            'official_code' => $canViewSchoolCode ? ($this->school_code ?: $this->ministry_code) : null,
             'ministry_code' => $this->ministry_code,
             'stage' => $this->stage,
             'program_type' => $this->program_type,
+            'program_types' => $this->relationLoaded('educationPrograms')
+                ? $this->educationPrograms->pluck('name_ar')->values()->all()
+                : collect(preg_split('/،|,/', (string) $this->program_type) ?: [])
+                    ->map(static fn (string $programType): string => trim($programType))
+                    ->filter()
+                    ->values()
+                    ->all(),
+            'programs' => $this->whenLoaded('educationPrograms', fn (): array => $this->educationPrograms
+                ->map(static fn ($program): array => [
+                    'id' => $program->id,
+                    'code' => $program->code,
+                    'name_ar' => $program->name_ar,
+                ])
+                ->values()
+                ->all()),
             'gender' => $this->gender,
             'region' => $this->region,
             'city' => $this->city,

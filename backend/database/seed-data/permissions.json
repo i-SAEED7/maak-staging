@@ -25,6 +25,10 @@
   { "key": "portfolios.update", "display_name_ar": "تعديل ملف إنجاز", "module": "portfolios" },
   { "key": "portfolios.add_item", "display_name_ar": "إضافة عنصر إلى ملف الإنجاز", "module": "portfolios" },
   { "key": "portfolios.delete_item", "display_name_ar": "حذف عنصر من ملف الإنجاز", "module": "portfolios" },
+  { "key": "teacher_portfolios.view", "display_name_ar": "عرض ملف إنجاز المعلم", "module": "teacher_portfolios" },
+  { "key": "teacher_portfolios.create", "display_name_ar": "إنشاء ملف إنجاز المعلم", "module": "teacher_portfolios" },
+  { "key": "teacher_portfolios.update", "display_name_ar": "تعديل ملف إنجاز المعلم", "module": "teacher_portfolios" },
+  { "key": "teacher_portfolios.delete", "display_name_ar": "حذف ملف إنجاز المعلم", "module": "teacher_portfolios" },
   { "key": "iep.view_any", "display_name_ar": "عرض الخطط", "module": "iep" },
   { "key": "iep.view", "display_name_ar": "عرض خطة", "module": "iep" },
   { "key": "iep.create", "display_name_ar": "إنشاء خطة", "module": "iep" },
@@ -69,5 +73,9 @@
   { "key": "announcements.update", "display_name_ar": "تعديل إعلان", "module": "announcements" },
   { "key": "announcements.delete", "display_name_ar": "حذف إعلان", "module": "announcements" },
   { "key": "audit_logs.view_any", "display_name_ar": "عرض سجل العمليات", "module": "audit_logs" },
-  { "key": "reference_data.manage", "display_name_ar": "إدارة البيانات المرجعية", "module": "reference_data" }
+  { "key": "reference_data.manage", "display_name_ar": "إدارة البيانات المرجعية", "module": "reference_data" },
+  { "key": "inspirational_quotes.view_any", "display_name_ar": "عرض العبارات الملهمة", "module": "inspirational_quotes" },
+  { "key": "inspirational_quotes.create", "display_name_ar": "إنشاء عبارة ملهمة", "module": "inspirational_quotes" },
+  { "key": "inspirational_quotes.update", "display_name_ar": "تعديل عبارة ملهمة", "module": "inspirational_quotes" },
+  { "key": "inspirational_quotes.delete", "display_name_ar": "حذف عبارة ملهمة", "module": "inspirational_quotes" }
 ]

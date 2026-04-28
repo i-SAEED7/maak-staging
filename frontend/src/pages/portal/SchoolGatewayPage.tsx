@@ -1,13 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 import { useSchoolSite } from "../../lib/schoolSite";
 import { announcementService, type AnnouncementItem } from "../../services/announcementService";
 import { getErrorMessage } from "../../services/api";
+import {
+  inspirationalQuoteService,
+  type InspirationalQuote
+} from "../../services/inspirationalQuoteService";
 
 type SchoolQuickLink = {
   to: string;
   title: string;
   text: string;
+};
+
+const defaultInspirationalQuote: InspirationalQuote = {
+  id: 0,
+  title: "عبارة سمو ولي العهد الأمير محمد بن سلمان حفظه الله",
+  body:
+    "وسنمكّن أبنائنا من ذوي الإعاقة من الحصول على فرص عمل مناسبة وتعليم يضمن استقلاليتهم واندماجهم بوصفهم عناصر فاعلة في المجتمع، كما سنمدهم بكل التسهيلات والأدوات التي تساعدهم على تحقيق النجاح",
+  is_active: true,
+  sort_order: 0
 };
 
 function buildQuickLinks(context: ReturnType<typeof useSchoolSite>): SchoolQuickLink[] {
@@ -48,6 +62,10 @@ function buildQuickLinks(context: ReturnType<typeof useSchoolSite>): SchoolQuick
   return links;
 }
 
+function formatTickerTitle(title: string) {
+  return title.trim().split(/\s+/).slice(0, 4).join(" ");
+}
+
 export function SchoolGatewayPage() {
   const context = useSchoolSite();
   const {
@@ -62,10 +80,11 @@ export function SchoolGatewayPage() {
   const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(canViewAnnouncements);
   const [announcementError, setAnnouncementError] = useState<string | null>(null);
-  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const [quotes, setQuotes] = useState<InspirationalQuote[]>([defaultInspirationalQuote]);
+  const [activeQuoteIndex, setActiveQuoteIndex] = useState(0);
 
   const quickLinks = useMemo(() => buildQuickLinks(context), [context]);
-  const sliderAnnouncements = useMemo(
+  const tickerAnnouncements = useMemo(
     () =>
       announcements.length
         ? announcements.slice(0, 5)
@@ -130,80 +149,89 @@ export function SchoolGatewayPage() {
   }, [canViewAnnouncements, school.id]);
 
   useEffect(() => {
-    setActiveSlideIndex(0);
-  }, [sliderAnnouncements.length]);
+    let isActive = true;
+
+    void inspirationalQuoteService
+      .publicList()
+      .then((payload) => {
+        if (!isActive) {
+          return;
+        }
+
+        setQuotes(payload.length ? payload : [defaultInspirationalQuote]);
+        setActiveQuoteIndex(0);
+      })
+      .catch(() => {
+        if (isActive) {
+          setQuotes([defaultInspirationalQuote]);
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   useEffect(() => {
-    if (sliderAnnouncements.length <= 1) {
+    if (quotes.length <= 1) {
       return;
     }
 
     const intervalId = window.setInterval(() => {
-      setActiveSlideIndex((current) => (current + 1) % sliderAnnouncements.length);
-    }, 5000);
+      setActiveQuoteIndex((current) => (current + 1) % quotes.length);
+    }, 6500);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [sliderAnnouncements.length]);
+  }, [quotes.length]);
 
-  const activeSlide = sliderAnnouncements[activeSlideIndex] ?? sliderAnnouncements[0];
+  const activeQuote = quotes[activeQuoteIndex] ?? defaultInspirationalQuote;
 
   return (
     <>
-      <section className="portal-surface page-stack school-announcement-slider">
-        <div className="page-header">
-          <div className="portal-section-heading">
-            <span className="portal-eyebrow">المستجدات</span>
-            <h2>شريط الإعلانات المدرسي</h2>
-          </div>
-
-          {canViewAnnouncements ? (
-            <Link className="portal-button portal-button-secondary" to={`${schoolPath}/announcements`}>
-              جميع الإعلانات
-            </Link>
-          ) : null}
-        </div>
-
-        {announcementError ? <div className="error-box">{announcementError}</div> : null}
-        {loadingAnnouncements ? <div className="loading-box">جارٍ تحميل الشريط الإعلاني...</div> : null}
-
-        {!loadingAnnouncements && activeSlide ? (
-          <div className="school-slider-surface">
-            <div className="school-slider-content">
-              <span className="portal-chip">
-                {activeSlide.is_all_schools ? "إعلان عام" : activeSlide.school?.name_ar ?? school.name}
+      <section className="school-gateway-ticker" aria-label="شريط الإعلانات المدرسي">
+        {announcementError ? <span className="school-gateway-ticker-error">{announcementError}</span> : null}
+        {loadingAnnouncements ? <span className="school-gateway-ticker-error">جارٍ تحميل الإعلانات...</span> : null}
+        {!loadingAnnouncements ? (
+          <div className="school-gateway-ticker-track">
+            {[...tickerAnnouncements, ...tickerAnnouncements].map((announcement, index) => (
+              <span className="school-gateway-ticker-item" key={`${announcement.id}-${index}`}>
+                <Sparkles aria-hidden="true" size={18} />
+                <strong>{formatTickerTitle(announcement.title)}</strong>
+                <span>:</span>
+                <span>{announcement.body}</span>
               </span>
-              <h3>{activeSlide.title}</h3>
-              <p>{activeSlide.body}</p>
-
-              {activeSlide.id ? (
-                <div className="portal-button-row">
-                  <Link
-                    className="portal-button portal-button-primary"
-                    to={`${schoolPath}/announcements/${activeSlide.id}`}
-                  >
-                    عرض الإعلان
-                  </Link>
-                </div>
-              ) : null}
-            </div>
-
-            {sliderAnnouncements.length > 1 ? (
-              <div className="school-slider-dots" role="tablist" aria-label="التنقل بين الإعلانات">
-                {sliderAnnouncements.map((slide, index) => (
-                  <button
-                    aria-label={`الانتقال إلى الإعلان ${index + 1}`}
-                    className={`school-slider-dot${index === activeSlideIndex ? " is-active" : ""}`}
-                    key={slide.id}
-                    onClick={() => setActiveSlideIndex(index)}
-                    type="button"
-                  />
-                ))}
-              </div>
-            ) : null}
+            ))}
           </div>
         ) : null}
+      </section>
+
+      <section className="portal-surface page-stack inspirational-section">
+        <div className="portal-section-heading">
+          <span className="portal-eyebrow">عبارات ملهمة</span>
+          <h2>إضاءات ملهمة</h2>
+        </div>
+
+        <div className="inspirational-slide">
+          <span className="portal-chip">عبارات ملهمة</span>
+          <h3>{activeQuote.title}</h3>
+          <p>{activeQuote.body}</p>
+
+          {quotes.length > 1 ? (
+            <div className="school-slider-dots" role="tablist" aria-label="التنقل بين العبارات الملهمة">
+              {quotes.map((quote, index) => (
+                <button
+                  aria-label={`الانتقال إلى العبارة ${index + 1}`}
+                  className={`school-slider-dot${index === activeQuoteIndex ? " is-active" : ""}`}
+                  key={quote.id}
+                  onClick={() => setActiveQuoteIndex(index)}
+                  type="button"
+                />
+              ))}
+            </div>
+          ) : null}
+        </div>
       </section>
 
       <section className="portal-surface page-stack">
@@ -228,10 +256,6 @@ export function SchoolGatewayPage() {
           <article className="portal-stat-card">
             <span>نوع البرنامج</span>
             <strong>{school.program_type ?? "-"}</strong>
-          </article>
-          <article className="portal-stat-card">
-            <span>كود المدرسة</span>
-            <strong>{school.school_code ?? school.official_code ?? "-"}</strong>
           </article>
         </div>
       </section>

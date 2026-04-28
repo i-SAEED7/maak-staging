@@ -9,11 +9,17 @@ export type SchoolUserOption = {
 export type SchoolItem = {
   id: number;
   name: string;
-  school_code: string;
+  school_code: string | null;
   slug?: string | null;
-  official_code: string;
+  official_code: string | null;
   stage: string | null;
   program_type: string | null;
+  program_types?: string[];
+  programs?: Array<{
+    id: number;
+    code: string;
+    name_ar: string;
+  }>;
   gender?: string | null;
   city: string | null;
   address: string | null;
@@ -32,6 +38,7 @@ export type SchoolFormPayload = {
   name: string;
   stage: string;
   program_type: string;
+  program_types?: string[];
   location_lat: string | number | null;
   location_lng: string | number | null;
   principal_id: number | null;

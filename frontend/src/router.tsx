@@ -4,12 +4,13 @@ import { AppShell } from "./components/layout/AppShell";
 import { PortalLayout } from "./components/portal/PortalLayout";
 import { SchoolSiteLayout } from "./components/portal/SchoolSiteLayout";
 import { AuditLogsPage } from "./pages/admin/AuditLogsPage";
+import { AccountApprovalsPage } from "./pages/admin/AccountApprovalsPage";
 import { ProgramsPage } from "./pages/admin/ProgramsPage";
+import { InspirationalQuotesPage } from "./pages/admin/InspirationalQuotesPage";
 import { AnnouncementDetailsPage } from "./pages/shared/AnnouncementDetailsPage";
 import { AnnouncementsPage } from "./pages/shared/AnnouncementsPage";
-import { CentralLoginPage } from "./pages/auth/CentralLoginPage";
-import { LoginPage } from "./pages/auth/LoginPage";
-import { SchoolLoginPage } from "./pages/auth/SchoolLoginPage";
+import { RegisterPage } from "./pages/auth/RegisterPage";
+import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
 import { SchoolsPage } from "./pages/admin/SchoolsPage";
 import { AboutPage } from "./pages/portal/AboutPage";
 import { ContactPage } from "./pages/portal/ContactPage";
@@ -44,6 +45,7 @@ import { StudentDetailsPage } from "./pages/shared/StudentDetailsPage";
 import { StudentsPage } from "./pages/shared/StudentsPage";
 import { SupervisorIepTeacherStudentsPage } from "./pages/shared/SupervisorIepTeacherStudentsPage";
 import { UsersPage } from "./pages/admin/UsersPage";
+import { PortfolioPage } from "./pages/teacher/PortfolioPage";
 import { resolvePostLoginPath } from "./lib/postLogin";
 import { useAuthStore } from "./stores/authStore";
 
@@ -57,7 +59,7 @@ function ProtectedAppLayout() {
   }
 
   if (!token || !user) {
-    return <Navigate replace to="/login" />;
+    return <Navigate replace to="/?login=1" />;
   }
 
   return <AppShell />;
@@ -73,7 +75,7 @@ function ProtectedPortalPage({ children }: { children: ReactNode }) {
   }
 
   if (!token || !user) {
-    return <Navigate replace to="/login" />;
+    return <Navigate replace to="/?login=1" />;
   }
 
   return children;
@@ -97,9 +99,9 @@ export const router = createBrowserRouter([
       { path: "statistics", element: <StatisticsPage /> },
       { path: "interactive-map", element: <InteractiveMapPage /> },
       { path: "contact", element: <ContactPage /> },
-      { path: "login", element: <LoginPage /> },
-      { path: "login/school", element: <SchoolLoginPage /> },
-      { path: "login/central", element: <CentralLoginPage /> },
+      { path: "login", element: <Navigate replace to="/?login=1" /> },
+      { path: "register", element: <RegisterPage /> },
+      { path: "reset-password", element: <ResetPasswordPage /> },
       {
         path: "select-school",
         element: (
@@ -136,7 +138,9 @@ export const router = createBrowserRouter([
       { path: "schools", element: <SchoolsPage /> },
       { path: "schools/:schoolId", element: <SchoolDetailsPage /> },
       { path: "programs", element: <ProgramsPage /> },
+      { path: "inspirational-quotes", element: <InspirationalQuotesPage /> },
       { path: "users", element: <UsersPage /> },
+      { path: "account-approvals", element: <AccountApprovalsPage /> },
       { path: "audit-logs", element: <AuditLogsPage /> },
       { path: "announcements", element: <AnnouncementsPage /> },
       { path: "announcements/:announcementId", element: <AnnouncementDetailsPage /> },
@@ -161,7 +165,8 @@ export const router = createBrowserRouter([
       { path: "messages/:threadKey", element: <MessagesPage /> },
       { path: "notifications", element: <NotificationsPage /> },
       { path: "reports", element: <ReportsPage /> },
-      { path: "files", element: <FilesPage /> }
+      { path: "files", element: <FilesPage /> },
+      { path: "teacher-portfolio", element: <PortfolioPage /> }
     ]
   },
   {

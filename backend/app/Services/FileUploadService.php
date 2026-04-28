@@ -123,6 +123,7 @@ final class FileUploadService
         return [
             'token' => $plainToken,
             'url' => url("/temporary-files/{$plainToken}"),
+            'preview_url' => url("/temporary-files/{$plainToken}?preview=1"),
             'expires_at' => $token->expires_at?->toAtomString(),
             'minutes' => $minutes,
         ];

@@ -12,6 +12,7 @@ const PERMISSION_MODULE_LABELS: Record<string, string> = {
   audit_logs: "سجل العمليات",
   files: "الملفات",
   iep: "الخطط الفردية",
+  inspirational_quotes: "العبارات الملهمة",
   messages: "الرسائل",
   notifications: "الإشعارات",
   portfolios: "ملفات الإنجاز",
@@ -22,6 +23,7 @@ const PERMISSION_MODULE_LABELS: Record<string, string> = {
   students: "الطلاب",
   supervision: "الإشراف التربوي",
   teacher_assignments: "إسناد الطلاب للمعلمين",
+  teacher_portfolios: "ملف إنجاز المعلم",
   users: "المستخدمون"
 };
 
@@ -40,6 +42,7 @@ const AUDIT_TARGET_LABELS: Record<string, string> = {
   EducationProgram: "برنامج تعليمي",
   File: "ملف",
   IepPlan: "خطة فردية",
+  InspirationalQuote: "عبارة ملهمة",
   Message: "رسالة",
   MessageThread: "سلسلة رسائل",
   Notification: "إشعار",
@@ -47,6 +50,7 @@ const AUDIT_TARGET_LABELS: Record<string, string> = {
   Student: "طالب",
   StudentReport: "تقرير طالب",
   SupervisorVisit: "زيارة إشرافية",
+  AccountApprovalRequest: "طلب اعتماد حساب",
   User: "مستخدم"
 };
 

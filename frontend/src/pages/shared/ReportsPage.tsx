@@ -92,7 +92,9 @@ export function ReportsPage() {
 
   const comparisonColumns: DataColumn<ComparisonReportRow>[] = [
     { key: "school_name", label: "المدرسة", render: (row) => <ReportsSchoolCell row={row} /> },
-    { key: "official_code", label: "الكود", render: (row) => row.official_code ?? "-" },
+    ...(isSuperAdmin
+      ? [{ key: "official_code", label: "الكود", render: (row: ComparisonReportRow) => row.official_code ?? "-" }]
+      : []),
     { key: "stage", label: "المرحلة", render: (row) => row.stage ?? "-" },
     { key: "program_type", label: "البرنامج", render: (row) => row.program_type ?? "-" },
     { key: "status", label: "الحالة", render: (row) => translateStatus(row.status) },

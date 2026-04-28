@@ -28,6 +28,7 @@ use App\Policies\StudentPolicy;
 use App\Policies\StudentReportPolicy;
 use App\Policies\SupervisorVisitPolicy;
 use App\Policies\UserPolicy;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 final class AuthServiceProvider extends ServiceProvider
@@ -50,5 +51,11 @@ final class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerPolicies();
+
+        ResetPassword::createUrlUsing(static function (User $user, string $token): string {
+            $frontendUrl = rtrim((string) config('app.frontend_url'), '/');
+
+            return $frontendUrl.'/reset-password?token='.urlencode($token).'&email='.urlencode((string) $user->email);
+        });
     }
 }

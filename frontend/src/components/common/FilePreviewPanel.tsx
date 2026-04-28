@@ -1,4 +1,5 @@
 import type { FileItem } from "../../services/fileService";
+import { useEffect, useState } from "react";
 
 type FilePreviewPanelProps = {
   file: FileItem;
@@ -45,6 +46,46 @@ export function FilePreviewPanel({
   onDownload
 }: FilePreviewPanelProps) {
   const previewMode = resolvePreviewMode(file);
+  const isTextPreview =
+    previewMode === "frame" &&
+    ((file.mime_type?.toLowerCase().startsWith("text/") ?? false) ||
+      ["txt", "csv", "json", "xml", "html"].includes(file.extension?.toLowerCase() ?? ""));
+  const [textContent, setTextContent] = useState<string | null>(null);
+  const [textError, setTextError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isTextPreview) {
+      setTextContent(null);
+      setTextError(null);
+      return;
+    }
+
+    let isActive = true;
+
+    fetch(previewUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("تعذر تحميل محتوى الملف النصي.");
+        }
+
+        return response.text();
+      })
+      .then((content) => {
+        if (isActive) {
+          setTextContent(content);
+          setTextError(null);
+        }
+      })
+      .catch(() => {
+        if (isActive) {
+          setTextError("تعذر عرض محتوى الملف النصي داخل المعاينة.");
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [isTextPreview, previewUrl]);
 
   return (
     <section className="surface-card page-stack file-preview-panel">
@@ -86,7 +127,13 @@ export function FilePreviewPanel({
         </div>
       ) : null}
 
-      {previewMode === "frame" ? (
+      {isTextPreview ? (
+        <pre className="file-preview-frame file-preview-text">
+          {textError ?? textContent ?? "جارٍ تحميل محتوى الملف النصي..."}
+        </pre>
+      ) : null}
+
+      {previewMode === "frame" && !isTextPreview ? (
         <iframe className="file-preview-frame" src={previewUrl} title={`معاينة ${file.original_name}`} />
       ) : null}
 

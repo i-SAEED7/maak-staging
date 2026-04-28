@@ -13,7 +13,8 @@ class UserResource extends JsonResource
     {
         $role = $this->relationLoaded('role') ? $this->role : null;
         $school = $this->relationLoaded('school') ? $this->school : null;
-        $assignedSchools = $this->resolveAssignedSchools($school);
+        $canViewSchoolCode = $request->user()?->role?->name === 'super_admin';
+        $assignedSchools = $this->resolveAssignedSchools($school, $canViewSchoolCode);
 
         return [
             'id' => $this->id,
@@ -29,7 +30,7 @@ class UserResource extends JsonResource
             'school' => $school ? [
                 'id' => $school->id,
                 'name_ar' => $school->name_ar,
-                'school_code' => $school->school_code,
+                'school_code' => $canViewSchoolCode ? $school->school_code : null,
                 'slug' => $school->slug,
                 'stage' => $school->stage,
                 'status' => $school->status,
@@ -39,7 +40,7 @@ class UserResource extends JsonResource
         ];
     }
 
-    private function resolveAssignedSchools(mixed $primarySchool): array
+    private function resolveAssignedSchools(mixed $primarySchool, bool $canViewSchoolCode): array
     {
         $schools = collect();
 
@@ -58,9 +59,9 @@ class UserResource extends JsonResource
             ->map(static fn ($school): array => [
                 'id' => $school->id,
                 'name_ar' => $school->name_ar,
-                'school_code' => $school->school_code,
+                'school_code' => $canViewSchoolCode ? $school->school_code : null,
                 'slug' => $school->slug,
-                'official_code' => $school->school_code ?: $school->ministry_code,
+                'official_code' => $canViewSchoolCode ? ($school->school_code ?: $school->ministry_code) : null,
                 'stage' => $school->stage,
                 'program_type' => $school->program_type,
                 'status' => $school->status,

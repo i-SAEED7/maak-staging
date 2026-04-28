@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\EducationProgram;
+use App\Models\InspirationalQuote;
 use App\Models\School;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -47,9 +48,9 @@ final class PortalController extends Controller
                 return [
                     'id' => $school->id,
                     'name_ar' => $school->name_ar,
-                    'school_code' => $school->school_code,
+                    'school_code' => null,
                     'slug' => $school->slug,
-                    'official_code' => $school->school_code ?: $school->ministry_code,
+                    'official_code' => null,
                     'stage' => $school->stage,
                     'program_type' => $school->program_type,
                     'gender' => $school->gender,
@@ -66,6 +67,22 @@ final class PortalController extends Controller
             'success' => true,
             'message' => 'تم جلب مدارس البوابة',
             'data' => $schools,
+        ]);
+    }
+
+    public function inspirationalQuotes(): JsonResponse
+    {
+        $quotes = InspirationalQuote::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderByDesc('created_at')
+            ->get(['id', 'uuid', 'title', 'body', 'is_active', 'sort_order'])
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم جلب العبارات الملهمة',
+            'data' => $quotes,
         ]);
     }
 

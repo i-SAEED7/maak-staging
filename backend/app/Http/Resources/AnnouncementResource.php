@@ -15,6 +15,7 @@ final class AnnouncementResource extends JsonResource
         $creator = $this->relationLoaded('creator') ? $this->creator : null;
         $views = $this->relationLoaded('views') ? $this->views : null;
         $canViewViews = in_array($request->user()?->role?->name, ['super_admin', 'admin'], true);
+        $canViewSchoolCode = $request->user()?->role?->name === 'super_admin';
 
         return [
             'id' => $this->id,
@@ -28,7 +29,7 @@ final class AnnouncementResource extends JsonResource
             'school' => $school ? [
                 'id' => $school->id,
                 'name_ar' => $school->name_ar,
-                'school_code' => $school->school_code,
+                'school_code' => $canViewSchoolCode ? $school->school_code : null,
             ] : null,
             'creator' => $creator ? [
                 'id' => $creator->id,

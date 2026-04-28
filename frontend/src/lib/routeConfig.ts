@@ -1,7 +1,7 @@
 export const routeConfig = {
-  public: ["/login", "/forgot-password", "/unauthorized"],
+  public: ["/login", "/register", "/reset-password", "/unauthorized"],
   authenticated: ["/notifications", "/messages"],
-  super_admin: ["/admin", "/admin/schools", "/admin/users", "/admin/reports", "/admin/audit-logs", "/admin/settings"],
+  super_admin: ["/admin", "/admin/schools", "/admin/users", "/admin/reports", "/admin/audit-logs", "/admin/settings", "/app/inspirational-quotes"],
   admin: ["/admin", "/admin/schools", "/admin/users", "/admin/reports"],
   supervisor: ["/supervisor", "/supervisor/schools", "/supervisor/visits", "/supervisor/iep-plans", "/supervisor/reports"],
   principal: ["/principal", "/principal/users", "/principal/students", "/principal/iep-plans", "/principal/reports"],

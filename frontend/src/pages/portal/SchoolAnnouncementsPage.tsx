@@ -100,7 +100,7 @@ export function SchoolAnnouncementsPage() {
           </article>
           <article className="portal-stat-card">
             <span>المدرسة الحالية</span>
-            <strong>{school.school_code ?? school.official_code ?? "-"}</strong>
+            <strong>{school.name}</strong>
           </article>
         </div>
       </section>

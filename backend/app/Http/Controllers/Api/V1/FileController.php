@@ -116,10 +116,19 @@ final class FileController extends Controller
         ]);
     }
 
-    public function downloadTemporary(string $token): StreamedResponse|BinaryFileResponse
+    public function downloadTemporary(Request $request, string $token): StreamedResponse|BinaryFileResponse
     {
         $payload = $this->fileUploadService->resolveDownloadByToken($token);
         $file = $payload['file'];
+
+        if ($request->boolean('preview')) {
+            return Storage::disk($file->storage_disk)->response(
+                $file->storage_path,
+                $file->original_name,
+                $payload['headers'],
+                'inline',
+            );
+        }
 
         return Storage::disk($file->storage_disk)->download(
             $file->storage_path,

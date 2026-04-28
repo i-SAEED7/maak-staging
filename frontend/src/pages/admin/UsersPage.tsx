@@ -1,4 +1,6 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { DataTable, type DataColumn } from "../../components/common/DataTable";
 import { getErrorMessage } from "../../services/api";
 import { schoolService, type SchoolItem } from "../../services/schoolService";
@@ -12,6 +14,8 @@ import {
 } from "../../services/userService";
 import { useAuthStore } from "../../stores/authStore";
 import { getPermissionModuleLabel, getRoleLabel } from "../../lib/uiText";
+import { userFormSchema } from "../../lib/formSchemas";
+import { cn } from "../../lib/utils";
 
 type UserFormValues = {
   full_name: string;
@@ -23,6 +27,8 @@ type UserFormValues = {
   password: string;
   must_change_password: boolean;
 };
+
+type UsersSection = "list" | "form" | "permissions";
 
 const defaultUserForm: UserFormValues = {
   full_name: "",
@@ -78,7 +84,6 @@ export function UsersPage() {
   const [permissionModules, setPermissionModules] = useState<PermissionModule[]>([]);
   const [roleUsers, setRoleUsers] = useState<RoleUserPermissionTarget[]>([]);
   const [editingUser, setEditingUser] = useState<UserOption | null>(null);
-  const [userForm, setUserForm] = useState<UserFormValues>(defaultUserForm);
   const [selectedRoleName, setSelectedRoleName] = useState("teacher");
   const [selectedRoleUserIds, setSelectedRoleUserIds] = useState<string[]>([]);
   const [selectedPermissionKeys, setSelectedPermissionKeys] = useState<string[]>([]);
@@ -94,6 +99,22 @@ export function UsersPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSupervisorSchoolsDropdownOpen, setIsSupervisorSchoolsDropdownOpen] = useState(false);
   const [isRoleUsersDropdownOpen, setIsRoleUsersDropdownOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<UsersSection>("list");
+  const [selectedUserDetails, setSelectedUserDetails] = useState<UserOption | null>(null);
+  const formSectionRef = useRef<HTMLElement | null>(null);
+  const permissionsSectionRef = useRef<HTMLElement | null>(null);
+  const {
+    formState: { errors: userFormErrors },
+    handleSubmit: handleUserFormSubmit,
+    register: registerUserForm,
+    reset: resetUserForm,
+    setValue: setUserFormValue,
+    watch: watchUserForm
+  } = useForm<UserFormValues>({
+    defaultValues: defaultUserForm,
+    resolver: zodResolver(userFormSchema)
+  });
+  const userForm = watchUserForm();
   const isSupervisorRole = userForm.role === "supervisor";
   const supervisorSchoolsDropdownRef = useRef<HTMLDivElement | null>(null);
   const roleUsersDropdownRef = useRef<HTMLDivElement | null>(null);
@@ -125,6 +146,28 @@ export function UsersPage() {
     );
   }, [roleUsers, roleUsersSearch]);
   const isAllRoleUsersSelected = selectedRoleUserIds.includes("__all__");
+
+  const jumpToSection = (section: UsersSection) => {
+    setActiveSection(section);
+    window.setTimeout(() => {
+      if (section === "form") {
+        formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      if (section === "permissions") {
+        permissionsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 0);
+  };
+
+  const selectUserForPermissions = (targetUser: UserOption) => {
+    if (targetUser.role) {
+      setSelectedRoleName(targetUser.role);
+    }
+
+    setSelectedRoleUserIds([String(targetUser.id)]);
+    jumpToSection("permissions");
+  };
 
   useEffect(() => {
     if (!isSuperAdmin) {
@@ -280,7 +323,7 @@ export function UsersPage() {
       key: "status",
       label: "الحالة",
       render: (row) => (
-        <span className={`status-pill${row.status === "inactive" ? " status-pill-inactive" : ""}`}>
+        <span className={cn("status-pill", row.status === "inactive" && "status-pill-inactive")}>
           {row.status === "active" ? "نشط" : "غير نشط"}
         </span>
       )
@@ -292,15 +335,30 @@ export function UsersPage() {
         <div className="button-row compact-actions">
           <button
             className="button button-secondary"
+            onClick={() => setSelectedUserDetails(row)}
+            type="button"
+          >
+            عرض
+          </button>
+          <button
+            className="button button-secondary"
             onClick={() => {
               setEditingUser(row);
-              setUserForm(toUserForm(row));
+              resetUserForm(toUserForm(row));
               setSuccessMessage(null);
               setError(null);
+              jumpToSection("form");
             }}
             type="button"
           >
             تعديل
+          </button>
+          <button
+            className="button button-secondary"
+            onClick={() => selectUserForPermissions(row)}
+            type="button"
+          >
+            الصلاحيات
           </button>
           <button
             className={`button ${row.status === "active" ? "button-ghost" : "button-primary"}`}
@@ -353,6 +411,36 @@ export function UsersPage() {
       {error ? <div className="error-box">{error}</div> : null}
       {successMessage ? <div className="info-box">{successMessage}</div> : null}
 
+      <div className="section-tabs">
+        <button
+          className={cn("button", activeSection === "list" ? "button-primary" : "button-secondary")}
+          onClick={() => jumpToSection("list")}
+          type="button"
+        >
+          الحسابات
+        </button>
+        <button
+          className={cn("button", activeSection === "form" ? "button-primary" : "button-secondary")}
+          onClick={() => {
+            if (!editingUser) {
+              resetUserForm(defaultUserForm);
+            }
+            jumpToSection("form");
+          }}
+          type="button"
+        >
+          إنشاء أو تعديل حساب
+        </button>
+        <button
+          className={cn("button", activeSection === "permissions" ? "button-primary" : "button-secondary")}
+          onClick={() => jumpToSection("permissions")}
+          type="button"
+        >
+          إدارة الصلاحيات
+        </button>
+      </div>
+
+      {activeSection === "list" ? (
       <section className="surface-card page-stack">
         <div className="page-header">
           <div>
@@ -396,25 +484,31 @@ export function UsersPage() {
         {loading ? <div className="loading-box">جارٍ تحميل الحسابات...</div> : null}
         {!loading ? <DataTable columns={columns} rows={rows} emptyMessage="لا توجد حسابات حالية." /> : null}
       </section>
+      ) : null}
 
-      <section className="surface-card page-stack">
+      {activeSection === "form" ? (
+      <section className="surface-card page-stack" ref={formSectionRef}>
         <div className="page-header">
           <div>
             <span className="eyebrow">{editingUser ? "تعديل" : "إنشاء"}</span>
             <h3>{editingUser ? `تعديل الحساب: ${editingUser.full_name}` : "إنشاء حساب جديد"}</h3>
           </div>
+          {editingUser ? (
+            <button className="button button-secondary" onClick={() => selectUserForPermissions(editingUser)} type="button">
+              إدارة صلاحيات هذا الحساب
+            </button>
+          ) : null}
         </div>
 
         <form
           className="page-stack"
-          onSubmit={async (event) => {
-            event.preventDefault();
+          onSubmit={handleUserFormSubmit(async (values) => {
             setSavingUser(true);
             setError(null);
             setSuccessMessage(null);
 
             try {
-              const payload = toUserPayload(userForm, editingUser);
+              const payload = toUserPayload(values, editingUser);
 
               if (editingUser) {
                 await userService.update(editingUser.id, payload);
@@ -425,7 +519,7 @@ export function UsersPage() {
               }
 
               setEditingUser(null);
-              setUserForm(defaultUserForm);
+              resetUserForm(defaultUserForm);
 
               const refreshed = await userService.list({
                 per_page: 100,
@@ -440,25 +534,25 @@ export function UsersPage() {
             } finally {
               setSavingUser(false);
             }
-          }}
+          })}
         >
           <div className="grid-two">
             <label className="field">
               <span>الاسم</span>
               <input
-                onChange={(event) => setUserForm((current) => ({ ...current, full_name: event.target.value }))}
                 required
-                value={userForm.full_name}
+                {...registerUserForm("full_name")}
               />
+              {userFormErrors.full_name ? <small className="field-hint">{userFormErrors.full_name.message}</small> : null}
             </label>
 
             <label className="field">
               <span>البريد</span>
               <input
-                onChange={(event) => setUserForm((current) => ({ ...current, email: event.target.value }))}
                 type="email"
-                value={userForm.email}
+                {...registerUserForm("email")}
               />
+              {userFormErrors.email ? <small className="field-hint">{userFormErrors.email.message}</small> : null}
             </label>
           </div>
 
@@ -466,16 +560,15 @@ export function UsersPage() {
             <label className="field">
               <span>الجوال</span>
               <input
-                onChange={(event) => setUserForm((current) => ({ ...current, phone: event.target.value }))}
-                value={userForm.phone}
+                {...registerUserForm("phone")}
               />
             </label>
 
             <label className="field">
               <span>الدور</span>
               <select
-                onChange={(event) => setUserForm((current) => ({ ...current, role: event.target.value }))}
                 value={userForm.role}
+                {...registerUserForm("role")}
               >
                 {roles.map((role) => (
                   <option key={role.id} value={role.name}>
@@ -490,8 +583,8 @@ export function UsersPage() {
             <label className="field">
               <span>{isSupervisorRole ? "المدرسة الأساسية" : "المدرسة"}</span>
               <select
-                onChange={(event) => setUserForm((current) => ({ ...current, school_id: event.target.value }))}
                 value={userForm.school_id}
+                {...registerUserForm("school_id")}
               >
                 <option value="">بدون مدرسة مباشرة</option>
                 {schools.map((school) => (
@@ -505,11 +598,10 @@ export function UsersPage() {
             <label className="field">
               <span>{editingUser ? "كلمة مرور جديدة" : "كلمة المرور"}</span>
               <input
-                onChange={(event) => setUserForm((current) => ({ ...current, password: event.target.value }))}
                 placeholder={editingUser ? "اتركه فارغًا إن لم ترغب بتغييرها" : "Password@123"}
                 required={!editingUser}
                 type="password"
-                value={userForm.password}
+                {...registerUserForm("password")}
               />
             </label>
           </div>
@@ -557,17 +649,12 @@ export function UsersPage() {
                             <input
                               checked={isChecked}
                               onChange={(event) => {
-                                setUserForm((current) => {
-                                  const nextSchoolIds = event.target.checked
-                                    ? [...current.school_ids, String(school.id)]
-                                    : current.school_ids.filter((schoolId) => schoolId !== String(school.id));
+                                const nextSchoolIds = event.target.checked
+                                  ? [...userForm.school_ids, String(school.id)]
+                                  : userForm.school_ids.filter((schoolId) => schoolId !== String(school.id));
 
-                                  return {
-                                    ...current,
-                                    school_ids: nextSchoolIds,
-                                    school_id: nextSchoolIds[0] ?? ""
-                                  };
-                                });
+                                setUserFormValue("school_ids", nextSchoolIds, { shouldValidate: true });
+                                setUserFormValue("school_id", nextSchoolIds[0] ?? "");
                               }}
                               type="checkbox"
                             />
@@ -591,6 +678,7 @@ export function UsersPage() {
                   </div>
                 ) : null}
               </div>
+              {userFormErrors.school_ids ? <small className="field-hint">{userFormErrors.school_ids.message}</small> : null}
               <small className="field-hint">اختر مدرسة واحدة أو أكثر، وسيتم تقييد حساب المشرف بها فقط.</small>
             </div>
           ) : null}
@@ -598,10 +686,8 @@ export function UsersPage() {
           <label className="checkbox-row">
             <input
               checked={userForm.must_change_password}
-              onChange={(event) =>
-                setUserForm((current) => ({ ...current, must_change_password: event.target.checked }))
-              }
               type="checkbox"
+              {...registerUserForm("must_change_password")}
             />
             <span>إجبار المستخدم على تغيير كلمة المرور عند أول دخول</span>
           </label>
@@ -614,7 +700,7 @@ export function UsersPage() {
               className="button button-ghost"
               onClick={() => {
                 setEditingUser(null);
-                setUserForm(defaultUserForm);
+                resetUserForm(defaultUserForm);
                 setError(null);
               }}
               type="button"
@@ -624,8 +710,10 @@ export function UsersPage() {
           </div>
         </form>
       </section>
+      ) : null}
 
-      <section className="surface-card page-stack">
+      {activeSection === "permissions" ? (
+      <section className="surface-card page-stack" ref={permissionsSectionRef}>
         <div className="page-header">
           <div>
             <span className="eyebrow">الصلاحيات</span>
@@ -856,6 +944,45 @@ export function UsersPage() {
           </button>
         </div>
       </section>
+      ) : null}
+
+      {selectedUserDetails ? (
+        <div className="modal-backdrop" role="presentation">
+          <section aria-modal="true" className="modal-card modal-card-narrow" role="dialog">
+            <div className="page-header">
+              <div>
+                <span className="eyebrow">بيانات الحساب</span>
+                <h3>{selectedUserDetails.full_name}</h3>
+              </div>
+              <button className="button button-ghost" onClick={() => setSelectedUserDetails(null)} type="button">
+                إغلاق
+              </button>
+            </div>
+            <div className="details-grid">
+              <div>
+                <span className="detail-label">الاسم</span>
+                <strong>{selectedUserDetails.full_name}</strong>
+              </div>
+              <div>
+                <span className="detail-label">البريد</span>
+                <strong>{selectedUserDetails.email ?? "-"}</strong>
+              </div>
+              <div>
+                <span className="detail-label">الدور</span>
+                <strong>{selectedUserDetails.role_display_name_ar ?? getRoleLabel(selectedUserDetails.role)}</strong>
+              </div>
+              <div>
+                <span className="detail-label">المدرسة</span>
+                <strong>{selectedUserDetails.school?.name_ar ?? selectedUserDetails.assigned_schools?.map((school) => school.name_ar).join("، ") ?? "-"}</strong>
+              </div>
+              <div>
+                <span className="detail-label">الحالة</span>
+                <strong>{selectedUserDetails.status === "active" ? "نشط" : "غير نشط"}</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }

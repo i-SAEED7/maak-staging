@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getErrorMessage } from "../../services/api";
 import { reportService, type SchoolSummaryReport } from "../../services/reportService";
 import { schoolService, type SchoolItem } from "../../services/schoolService";
+import { useAuthStore } from "../../stores/authStore";
 
 const overviewLabels: Record<string, string> = {
   students_count: "عدد الطلاب",
@@ -18,6 +19,8 @@ const overviewLabels: Record<string, string> = {
 
 export function SchoolDetailsPage() {
   const { schoolId } = useParams();
+  const user = useAuthStore((state) => state.user);
+  const isSuperAdmin = user?.role === "super_admin";
   const [school, setSchool] = useState<SchoolItem | null>(null);
   const [summary, setSummary] = useState<SchoolSummaryReport | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,10 +59,12 @@ export function SchoolDetailsPage() {
         <>
           <section className="surface-card page-stack">
             <div className="detail-grid">
-              <div>
-                <span className="detail-label">كود المدرسة</span>
-                <strong>{school.school_code ?? school.official_code ?? "-"}</strong>
-              </div>
+              {isSuperAdmin ? (
+                <div>
+                  <span className="detail-label">كود المدرسة</span>
+                  <strong>{school.school_code ?? school.official_code ?? "-"}</strong>
+                </div>
+              ) : null}
               <div>
                 <span className="detail-label">المرحلة</span>
                 <strong>{school.stage ?? "-"}</strong>

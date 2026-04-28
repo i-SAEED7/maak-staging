@@ -64,7 +64,7 @@ export const fileService = {
   temporaryLink: async (id: number, expiresInMinutes: number) => {
     const response = await apiClient.post<{
       file: FileItem;
-      temporary_link: { url: string; expires_at: string };
+      temporary_link: { url: string; preview_url?: string; expires_at: string };
     }>(`/api/v1/files/${id}/temporary-link`, {
       expires_in_minutes: expiresInMinutes
     });

@@ -15,8 +15,6 @@ type AuthStore = {
   status: AuthStatus;
   initialize: () => Promise<void>;
   login: (payload: { identifier: string; password: string }) => Promise<void>;
-  loginCentral: (payload: { identifier: string; password: string }) => Promise<void>;
-  loginSchool: (payload: { identifier: string; password: string; schoolCode: string }) => Promise<void>;
   logout: () => Promise<void>;
   setSchoolId: (value: string) => void;
 };
@@ -125,50 +123,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       const payload = await authService.login(identifier, password);
       const resolvedSchoolId = resolveSchoolId(payload.user, get().schoolId);
-
-      window.localStorage.setItem(TOKEN_KEY, payload.token);
-      persistSchoolId(resolvedSchoolId);
-      persistUserRole(payload.user.role);
-
-      set({
-        token: payload.token,
-        schoolId: resolvedSchoolId,
-        user: payload.user,
-        permissions: payload.permissions,
-        status: "ready"
-      });
-    } catch (error) {
-      resetAuthState(set);
-      throw error;
-    }
-  },
-  loginCentral: async ({ identifier, password }) => {
-    set({ status: "loading" });
-    try {
-      const payload = await authService.loginCentral(identifier, password);
-      const resolvedSchoolId = resolveSchoolId(payload.user, "");
-
-      window.localStorage.setItem(TOKEN_KEY, payload.token);
-      persistSchoolId(resolvedSchoolId);
-      persistUserRole(payload.user.role);
-
-      set({
-        token: payload.token,
-        schoolId: resolvedSchoolId,
-        user: payload.user,
-        permissions: payload.permissions,
-        status: "ready"
-      });
-    } catch (error) {
-      resetAuthState(set);
-      throw error;
-    }
-  },
-  loginSchool: async ({ identifier, password, schoolCode }) => {
-    set({ status: "loading" });
-    try {
-      const payload = await authService.loginSchool(identifier, password, schoolCode);
-      const resolvedSchoolId = resolveSchoolId(payload.user, "");
 
       window.localStorage.setItem(TOKEN_KEY, payload.token);
       persistSchoolId(resolvedSchoolId);
