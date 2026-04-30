@@ -3685,13 +3685,10 @@ body.portal-home-active .portal-hero-action {
 }
 
 body.portal-home-active .portal-slider-controls {
-  position: absolute;
-  right: 50%;
-  bottom: clamp(132px, 20vh, 180px);
-  transform: translateX(50%);
   display: flex;
   width: auto;
   gap: 10px;
+  margin-top: 1rem;
 }
 
 body.portal-home-active .portal-slider-dot {
@@ -3705,15 +3702,12 @@ body.portal-home-active .portal-slider-dot.is-active {
 }
 
 body.portal-home-active .portal-hero-scroll-hint {
-  position: absolute;
-  bottom: 34px;
-  left: 50%;
   display: grid;
   justify-items: center;
   gap: 8px;
-  transform: translateX(-50%);
   color: rgba(255, 255, 255, 0.88);
   font-weight: 800;
+  margin-top: 2rem;
 }
 
 body.portal-home-active .portal-hero-scroll-arrow {
