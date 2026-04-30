@@ -197,6 +197,19 @@ textarea {
   position: sticky;
   top: 20px;
   height: calc(100vh - 40px);
+  overflow-y: auto;
+  border-radius: 24px;
+}
+
+.sidebar-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-panel::-webkit-scrollbar-thumb {
+  background: rgba(123, 97, 58, 0.2);
+  border-radius: 4px;
+}
+.dark .sidebar-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .brand-block h1,
@@ -341,6 +354,7 @@ textarea {
   text-align: right;
   border-bottom: 1px solid #efe4d3;
   vertical-align: top;
+  white-space: nowrap;
 }
 
 .data-table th {
@@ -475,7 +489,7 @@ textarea {
   top: calc(100% + 8px);
   right: 0;
   left: 0;
-  z-index: 20;
+  z-index: 50;
   width: 100%;
   padding: 0.9rem 1rem 1rem;
   border: 1px solid #d6c9b4;
@@ -731,15 +745,9 @@ textarea {
 }
 
 @media (max-width: 1100px) {
-  .app-shell,
   .auth-shell,
   .card-grid {
     grid-template-columns: 1fr;
-  }
-
-  .sidebar-panel {
-    position: static;
-    height: auto;
   }
 }
 
@@ -2216,6 +2224,145 @@ iframe {
   font-family: "MaakFont", "Helvetica Neue", Arial, sans-serif;
   color: var(--color-body);
   background: var(--color-bg);
+}
+
+/* Dark Mode Variables */
+.dark {
+  --color-primary: #9B7FD4;
+  --color-secondary: #B87FE0;
+  --color-accent: #3DBDD6;
+  --color-accent-strong: #5CC8E0;
+  --color-cyan: #2EEAF6;
+  --color-sky: #4BC5F0;
+  --color-violet: #B06CFF;
+  --color-lavender: #9B9FD4;
+  --color-muted-purple: #9884C4;
+  --color-deep: #1A5A6A;
+  --color-title: #E8E2F4;
+  --color-body: #A8A8B8;
+  --color-bg: #0F0F1A;
+  --gradient-official: linear-gradient(90deg, #5CC8E0 0%, #7B9AD0 50%, #9B7FD4 100%);
+  --gradient-official-soft: linear-gradient(135deg, rgba(92, 200, 224, 0.1), rgba(155, 127, 212, 0.1));
+  --glass-bg: rgba(22, 22, 38, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --shadow-soft: 0 24px 70px rgba(0, 0, 0, 0.36);
+  --portal-primary: var(--color-accent);
+  --portal-secondary: var(--color-secondary);
+  --portal-accent: var(--color-accent-strong);
+  --portal-dark: var(--color-title);
+  --portal-warm: var(--color-lavender);
+  --portal-gray: #3a3a4a;
+  --portal-surface: rgba(22, 22, 38, 0.72);
+  --portal-shadow: var(--shadow-soft);
+}
+
+.dark body {
+  color: var(--color-body);
+  background:
+    radial-gradient(circle at top right, rgba(92, 200, 224, 0.08), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(155, 127, 212, 0.06), transparent 30%),
+    var(--color-bg);
+}
+
+.dark .auth-card,
+.dark .hero-card,
+.dark .surface-card,
+.dark .content-panel,
+.dark .sidebar-panel,
+.dark .topbar,
+.dark .table-card,
+.dark .shortcut-card,
+.dark .info-box,
+.dark .loading-box,
+.dark .portal-surface,
+.dark .portal-card,
+.dark .portal-quote-card,
+.dark .portal-stat-card,
+.dark .portal-map-card,
+.dark .portal-map-school,
+.dark .portal-contact-note,
+.dark .portal-school-hero,
+.dark .context-card,
+.dark .stat-card,
+.dark .goal-card,
+.dark .map-placeholder,
+.dark .detail-list-item,
+.dark .permission-module-card,
+.dark .details-grid > div,
+.dark .modal-card {
+  border-color: rgba(255, 255, 255, 0.06);
+  background: var(--glass-bg);
+  box-shadow: var(--shadow-soft);
+}
+
+.dark .field input,
+.dark .field select,
+.dark .field textarea,
+.dark .context-select,
+.dark .dropdown-search-input,
+.dark .checkbox-dropdown {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(30, 30, 50, 0.8);
+  color: var(--color-title);
+}
+
+.dark .data-table th {
+  background: rgba(92, 200, 224, 0.08);
+  color: var(--color-title);
+}
+
+.dark .data-table td {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark .nav-link {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-title);
+}
+
+.dark .portal-shell {
+  background:
+    radial-gradient(circle at top right, rgba(92, 200, 224, 0.08), transparent 25%),
+    radial-gradient(circle at bottom left, rgba(155, 127, 212, 0.06), transparent 28%),
+    var(--color-bg);
+}
+
+.dark .portal-nav-shell,
+.dark .maak-main-header,
+.dark .school-gateway-header {
+  background: rgba(22, 22, 38, 0.72);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+}
+
+.dark .sidebar-panel {
+  background:
+    linear-gradient(180deg, rgba(22, 22, 38, 0.82), rgba(22, 22, 38, 0.62)),
+    var(--gradient-official-soft);
+}
+
+.dark .topbar {
+  background:
+    linear-gradient(135deg, rgba(22, 22, 38, 0.78), rgba(22, 22, 38, 0.56)),
+    var(--gradient-official-soft);
+}
+
+.dark .modal-backdrop {
+  background: rgba(0, 0, 0, 0.52);
+}
+
+.dark .modal-card {
+  background: rgba(22, 22, 38, 0.96);
+}
+
+.dark .selection-option {
+  border-color: rgba(255, 255, 255, 0.06);
+  background: rgba(30, 30, 50, 0.7);
+}
+
+.dark .checkbox-dropdown-panel {
+  background: rgba(22, 22, 38, 0.95);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 body,

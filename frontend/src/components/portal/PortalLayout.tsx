@@ -52,18 +52,18 @@ export function PortalLayout() {
 
   return (
     <div className="portal-shell">
-      <header className="maak-main-header-wrap">
-        <div className="maak-main-header" data-version="maak-header-v2">
-          <div className="maak-main-header__brand">
+      <header className="portal-header">
+        <div className="portal-nav-shell" data-version="maak-header-v2">
+          <div className="portal-brand">
             <strong>بوابة معاك</strong>
             <span>إدارة تنمية القدرات - قسم ذوي الإعاقة</span>
           </div>
 
-          <nav className="maak-main-header__nav">
+          <nav className="portal-nav hidden md:flex">
             {portalNavigation.map((item) => (
               <NavLink
                 key={item.to}
-                className={({ isActive }) => `maak-main-header__link${isActive ? " is-active" : ""}`}
+                className={({ isActive }) => `portal-nav-link${isActive ? " is-active" : ""}`}
                 end={item.to === "/"}
                 to={item.to}
               >
@@ -72,17 +72,17 @@ export function PortalLayout() {
             ))}
           </nav>
 
-          <div className="maak-main-header__actions">
+          <div className="portal-nav-actions">
             {token && user ? (
-              <NavLink className="maak-main-header__login" to={resolvePostLoginPath(user)}>
+              <NavLink className="portal-login-button" to={resolvePostLoginPath(user)}>
                 بوابتي
               </NavLink>
             ) : (
               <>
-                <NavLink className="maak-main-header__register" to="/register">
+                <NavLink className="portal-register-button hidden sm:inline-flex" to="/register">
                   سجل الآن
                 </NavLink>
-                <button className="maak-main-header__login" onClick={() => setLoginModalOpen(true)} type="button">
+                <button className="portal-login-button" onClick={() => setLoginModalOpen(true)} type="button">
                   تسجيل الدخول
                 </button>
               </>

@@ -42,7 +42,7 @@ final class IepPlanPolicy
 
     public function supervisorApprove(User $user, IepPlan $iepPlan): bool
     {
-        return false;
+        return $user->hasPermission('iep.supervisor_approve');
     }
 
     public function acknowledge(User $user, IepPlan $iepPlan): bool
@@ -52,8 +52,7 @@ final class IepPlanPolicy
 
     public function reject(User $user, IepPlan $iepPlan): bool
     {
-        return $user->role?->name !== 'supervisor'
-            && $user->hasPermission('iep.reject');
+        return $user->hasPermission('iep.reject');
     }
 
     public function comment(User $user, IepPlan $iepPlan): bool

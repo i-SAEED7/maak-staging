@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Traits\BelongsToSchool;
+use App\Traits\HasEncryptedFields;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,7 +15,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Student extends Model
 {
     use BelongsToSchool;
+    use HasEncryptedFields;
     use SoftDeletes;
+
+    /**
+     * Fields that contain PII and must be encrypted at rest.
+     */
+    protected array $encryptedFields = [
+        'national_id_encrypted',
+        'medical_notes',
+        'social_notes',
+    ];
 
     protected $fillable = [
         'uuid',

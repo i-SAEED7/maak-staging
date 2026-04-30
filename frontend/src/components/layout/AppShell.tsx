@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   Bell,
@@ -15,11 +16,14 @@ import {
   Archive,
   FolderKanban,
   UserCheck,
-  Users
+  Users,
+  Menu,
+  X
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuthStore } from "../../stores/authStore";
 import { getRoleLabel } from "../../lib/uiText";
+import { ThemeToggle } from "../ui/ThemeToggle";
 
 type NavItem = {
   to: string;
@@ -61,6 +65,7 @@ export function AppShell() {
   const setSchoolId = useAuthStore((state) => state.setSchoolId);
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const normalizedRole = (user?.role ?? "").trim().toLowerCase();
   const hasPermission = (permission: string) => permissions.includes("*") || permissions.includes(permission);
   const assignedSchools = user?.assigned_schools ?? [];
@@ -104,8 +109,27 @@ export function AppShell() {
   ];
 
   return (
-    <div className="app-shell">
-      <aside className="sidebar-panel">
+    <div className="app-shell relative">
+      {/* Mobile Toggle Button */}
+      <button 
+        className="md:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded-lg shadow-md border border-[rgba(123,97,58,0.15)]"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      >
+        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Backdrop for mobile */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      <aside className={cn(
+        "sidebar-panel z-40 bg-[rgba(255,252,247,0.95)] backdrop-blur-md transition-transform duration-300 md:translate-x-0",
+        isMobileMenuOpen ? "translate-x-0 fixed inset-y-0 right-0 w-[280px] shadow-2xl" : "translate-x-full fixed md:sticky md:block"
+      )}>
         <div className="brand-block">
           <span className="eyebrow">معاك</span>
           <h1>لوحة التشغيل</h1>
@@ -147,6 +171,7 @@ export function AppShell() {
               className={({ isActive }) =>
                 cn("nav-link", isActive && "nav-link-active")
               }
+              onClick={() => setIsMobileMenuOpen(false)}
               to={item.to}
             >
               <span className="nav-link-content">
@@ -164,17 +189,21 @@ export function AppShell() {
           </Link>
         ) : null}
 
-        <button
-          className="button button-secondary"
-          onClick={async () => {
-            await logout();
-            navigate("/?login=1", { replace: true });
-          }}
-          type="button"
-        >
-          <LogOut size={18} />
-          تسجيل الخروج
-        </button>
+        <div className="flex items-center gap-3" style={{ display: 'flex', gap: '10px' }}>
+          <ThemeToggle />
+          <button
+            className="button button-secondary"
+            onClick={async () => {
+              await logout();
+              navigate("/?login=1", { replace: true });
+            }}
+            style={{ flex: 1 }}
+            type="button"
+          >
+            <LogOut size={18} />
+            تسجيل الخروج
+          </button>
+        </div>
       </aside>
 
       <div className="content-shell">

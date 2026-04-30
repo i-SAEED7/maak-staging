@@ -1,53 +1,76 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import type { ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { PortalLayout } from "./components/portal/PortalLayout";
 import { SchoolSiteLayout } from "./components/portal/SchoolSiteLayout";
-import { AuditLogsPage } from "./pages/admin/AuditLogsPage";
-import { AccountApprovalsPage } from "./pages/admin/AccountApprovalsPage";
-import { ProgramsPage } from "./pages/admin/ProgramsPage";
-import { InspirationalQuotesPage } from "./pages/admin/InspirationalQuotesPage";
-import { AnnouncementDetailsPage } from "./pages/shared/AnnouncementDetailsPage";
-import { AnnouncementsPage } from "./pages/shared/AnnouncementsPage";
-import { RegisterPage } from "./pages/auth/RegisterPage";
-import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
-import { SchoolsPage } from "./pages/admin/SchoolsPage";
-import { AboutPage } from "./pages/portal/AboutPage";
-import { ContactPage } from "./pages/portal/ContactPage";
-import { HomePage } from "./pages/portal/HomePage";
-import { InteractiveMapPage } from "./pages/portal/InteractiveMapPage";
-import { ProgramDetailsPage } from "./pages/portal/ProgramDetailsPage";
-import { SchoolAnnouncementsPage } from "./pages/portal/SchoolAnnouncementsPage";
-import { SchoolContactPage } from "./pages/portal/SchoolContactPage";
-import { SchoolFilesPage } from "./pages/portal/SchoolFilesPage";
-import { SchoolGatewayPage } from "./pages/portal/SchoolGatewayPage";
-import { SchoolProgramDetailsPage } from "./pages/portal/SchoolProgramDetailsPage";
-import { SchoolProgramsPage } from "./pages/portal/SchoolProgramsPage";
-import { SchoolSelectionPage } from "./pages/portal/SchoolSelectionPage";
-import { SchoolServicesPage } from "./pages/portal/SchoolServicesPage";
-import { ServicesPage } from "./pages/portal/ServicesPage";
-import { StatisticsPage } from "./pages/portal/StatisticsPage";
-import { DashboardPage } from "./pages/shared/DashboardPage";
-import { FilesPage } from "./pages/shared/FilesPage";
-import { IepPlanCreatePage } from "./pages/shared/IepPlanCreatePage";
-import { IepPlanDetailsPage } from "./pages/shared/IepPlanDetailsPage";
-import { IepPlanEditPage } from "./pages/shared/IepPlanEditPage";
-import { IepPlansPage } from "./pages/shared/IepPlansPage";
-import { MessagesPage } from "./pages/shared/MessagesPage";
-import { NotificationsPage } from "./pages/shared/NotificationsPage";
-import { ReportsPage } from "./pages/shared/ReportsPage";
-import { SupervisorIepClassTeachersPage } from "./pages/shared/SupervisorIepClassTeachersPage";
-import { SupervisorIepProgramClassesPage } from "./pages/shared/SupervisorIepProgramClassesPage";
-import { SupervisorIepSchoolProgramsPage } from "./pages/shared/SupervisorIepSchoolProgramsPage";
-import { SchoolDetailsPage } from "./pages/shared/SchoolDetailsPage";
-import { StudentEditPage } from "./pages/shared/StudentEditPage";
-import { StudentDetailsPage } from "./pages/shared/StudentDetailsPage";
-import { StudentsPage } from "./pages/shared/StudentsPage";
-import { SupervisorIepTeacherStudentsPage } from "./pages/shared/SupervisorIepTeacherStudentsPage";
-import { UsersPage } from "./pages/admin/UsersPage";
-import { PortfolioPage } from "./pages/teacher/PortfolioPage";
 import { resolvePostLoginPath } from "./lib/postLogin";
 import { useAuthStore } from "./stores/authStore";
+
+/* ---------- Lazy-loaded pages (code splitting) ---------- */
+
+// Admin pages
+const AuditLogsPage = lazy(() => import("./pages/admin/AuditLogsPage").then(m => ({ default: m.AuditLogsPage })));
+const AccountApprovalsPage = lazy(() => import("./pages/admin/AccountApprovalsPage").then(m => ({ default: m.AccountApprovalsPage })));
+const ProgramsPage = lazy(() => import("./pages/admin/ProgramsPage").then(m => ({ default: m.ProgramsPage })));
+const InspirationalQuotesPage = lazy(() => import("./pages/admin/InspirationalQuotesPage").then(m => ({ default: m.InspirationalQuotesPage })));
+const SchoolsPage = lazy(() => import("./pages/admin/SchoolsPage").then(m => ({ default: m.SchoolsPage })));
+const UsersPage = lazy(() => import("./pages/admin/UsersPage").then(m => ({ default: m.UsersPage })));
+
+// Auth pages
+const RegisterPage = lazy(() => import("./pages/auth/RegisterPage").then(m => ({ default: m.RegisterPage })));
+const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage").then(m => ({ default: m.ResetPasswordPage })));
+
+// Portal pages
+const AboutPage = lazy(() => import("./pages/portal/AboutPage").then(m => ({ default: m.AboutPage })));
+const ContactPage = lazy(() => import("./pages/portal/ContactPage").then(m => ({ default: m.ContactPage })));
+const HomePage = lazy(() => import("./pages/portal/HomePage").then(m => ({ default: m.HomePage })));
+const InteractiveMapPage = lazy(() => import("./pages/portal/InteractiveMapPage").then(m => ({ default: m.InteractiveMapPage })));
+const ProgramDetailsPage = lazy(() => import("./pages/portal/ProgramDetailsPage").then(m => ({ default: m.ProgramDetailsPage })));
+const SchoolAnnouncementsPage = lazy(() => import("./pages/portal/SchoolAnnouncementsPage").then(m => ({ default: m.SchoolAnnouncementsPage })));
+const SchoolContactPage = lazy(() => import("./pages/portal/SchoolContactPage").then(m => ({ default: m.SchoolContactPage })));
+const SchoolFilesPage = lazy(() => import("./pages/portal/SchoolFilesPage").then(m => ({ default: m.SchoolFilesPage })));
+const SchoolGatewayPage = lazy(() => import("./pages/portal/SchoolGatewayPage").then(m => ({ default: m.SchoolGatewayPage })));
+const SchoolProgramDetailsPage = lazy(() => import("./pages/portal/SchoolProgramDetailsPage").then(m => ({ default: m.SchoolProgramDetailsPage })));
+const SchoolProgramsPage = lazy(() => import("./pages/portal/SchoolProgramsPage").then(m => ({ default: m.SchoolProgramsPage })));
+const SchoolSelectionPage = lazy(() => import("./pages/portal/SchoolSelectionPage").then(m => ({ default: m.SchoolSelectionPage })));
+const SchoolServicesPage = lazy(() => import("./pages/portal/SchoolServicesPage").then(m => ({ default: m.SchoolServicesPage })));
+const ServicesPage = lazy(() => import("./pages/portal/ServicesPage").then(m => ({ default: m.ServicesPage })));
+const StatisticsPage = lazy(() => import("./pages/portal/StatisticsPage").then(m => ({ default: m.StatisticsPage })));
+const Test3DPage = lazy(() => import("./pages/portal/Test3DPage").then(m => ({ default: m.Test3DPage })));
+
+// Shared pages
+const AnnouncementDetailsPage = lazy(() => import("./pages/shared/AnnouncementDetailsPage").then(m => ({ default: m.AnnouncementDetailsPage })));
+const AnnouncementsPage = lazy(() => import("./pages/shared/AnnouncementsPage").then(m => ({ default: m.AnnouncementsPage })));
+const DashboardPage = lazy(() => import("./pages/shared/DashboardPage").then(m => ({ default: m.DashboardPage })));
+const FilesPage = lazy(() => import("./pages/shared/FilesPage").then(m => ({ default: m.FilesPage })));
+const IepPlanCreatePage = lazy(() => import("./pages/shared/IepPlanCreatePage").then(m => ({ default: m.IepPlanCreatePage })));
+const IepPlanDetailsPage = lazy(() => import("./pages/shared/IepPlanDetailsPage").then(m => ({ default: m.IepPlanDetailsPage })));
+const IepPlanEditPage = lazy(() => import("./pages/shared/IepPlanEditPage").then(m => ({ default: m.IepPlanEditPage })));
+const IepPlansPage = lazy(() => import("./pages/shared/IepPlansPage").then(m => ({ default: m.IepPlansPage })));
+const MessagesPage = lazy(() => import("./pages/shared/MessagesPage").then(m => ({ default: m.MessagesPage })));
+const NotificationsPage = lazy(() => import("./pages/shared/NotificationsPage").then(m => ({ default: m.NotificationsPage })));
+const ReportsPage = lazy(() => import("./pages/shared/ReportsPage").then(m => ({ default: m.ReportsPage })));
+const SupervisorIepClassTeachersPage = lazy(() => import("./pages/shared/SupervisorIepClassTeachersPage").then(m => ({ default: m.SupervisorIepClassTeachersPage })));
+const SupervisorIepProgramClassesPage = lazy(() => import("./pages/shared/SupervisorIepProgramClassesPage").then(m => ({ default: m.SupervisorIepProgramClassesPage })));
+const SupervisorIepSchoolProgramsPage = lazy(() => import("./pages/shared/SupervisorIepSchoolProgramsPage").then(m => ({ default: m.SupervisorIepSchoolProgramsPage })));
+const SchoolDetailsPage = lazy(() => import("./pages/shared/SchoolDetailsPage").then(m => ({ default: m.SchoolDetailsPage })));
+const StudentEditPage = lazy(() => import("./pages/shared/StudentEditPage").then(m => ({ default: m.StudentEditPage })));
+const StudentDetailsPage = lazy(() => import("./pages/shared/StudentDetailsPage").then(m => ({ default: m.StudentDetailsPage })));
+const StudentsPage = lazy(() => import("./pages/shared/StudentsPage").then(m => ({ default: m.StudentsPage })));
+const SupervisorIepTeacherStudentsPage = lazy(() => import("./pages/shared/SupervisorIepTeacherStudentsPage").then(m => ({ default: m.SupervisorIepTeacherStudentsPage })));
+
+// Teacher pages
+const PortfolioPage = lazy(() => import("./pages/teacher/PortfolioPage").then(m => ({ default: m.PortfolioPage })));
+
+/* ---------- Suspense wrapper ---------- */
+
+function LazyPage({ children }: { children: ReactNode }) {
+  return (
+    <Suspense fallback={<div className="fullscreen-message">جارٍ تحميل الصفحة...</div>}>
+      {children}
+    </Suspense>
+  );
+}
 
 function ProtectedAppLayout() {
   const token = useAuthStore((state) => state.token);
@@ -92,21 +115,22 @@ export const router = createBrowserRouter([
     path: "/",
     element: <PortalLayout />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: "about", element: <AboutPage /> },
-      { path: "services", element: <ServicesPage /> },
-      { path: "programs/:programSlug", element: <ProgramDetailsPage /> },
-      { path: "statistics", element: <StatisticsPage /> },
-      { path: "interactive-map", element: <InteractiveMapPage /> },
-      { path: "contact", element: <ContactPage /> },
+      { index: true, element: <LazyPage><HomePage /></LazyPage> },
+      { path: "about", element: <LazyPage><AboutPage /></LazyPage> },
+      { path: "services", element: <LazyPage><ServicesPage /></LazyPage> },
+      { path: "programs/:programSlug", element: <LazyPage><ProgramDetailsPage /></LazyPage> },
+      { path: "statistics", element: <LazyPage><StatisticsPage /></LazyPage> },
+      { path: "interactive-map", element: <LazyPage><InteractiveMapPage /></LazyPage> },
+      { path: "contact", element: <LazyPage><ContactPage /></LazyPage> },
+      { path: "test-3d", element: <LazyPage><Test3DPage /></LazyPage> },
       { path: "login", element: <Navigate replace to="/?login=1" /> },
-      { path: "register", element: <RegisterPage /> },
-      { path: "reset-password", element: <ResetPasswordPage /> },
+      { path: "register", element: <LazyPage><RegisterPage /></LazyPage> },
+      { path: "reset-password", element: <LazyPage><ResetPasswordPage /></LazyPage> },
       {
         path: "select-school",
         element: (
           <ProtectedPortalPage>
-            <SchoolSelectionPage />
+            <LazyPage><SchoolSelectionPage /></LazyPage>
           </ProtectedPortalPage>
         )
       },
@@ -118,14 +142,14 @@ export const router = createBrowserRouter([
           </ProtectedPortalPage>
         ),
         children: [
-          { index: true, element: <SchoolGatewayPage /> },
-          { path: "programs", element: <SchoolProgramsPage /> },
-          { path: "programs/:programSlug", element: <SchoolProgramDetailsPage /> },
-          { path: "files", element: <SchoolFilesPage /> },
-          { path: "announcements", element: <SchoolAnnouncementsPage /> },
-          { path: "announcements/:announcementId", element: <AnnouncementDetailsPage /> },
-          { path: "services", element: <SchoolServicesPage /> },
-          { path: "contact", element: <SchoolContactPage /> }
+          { index: true, element: <LazyPage><SchoolGatewayPage /></LazyPage> },
+          { path: "programs", element: <LazyPage><SchoolProgramsPage /></LazyPage> },
+          { path: "programs/:programSlug", element: <LazyPage><SchoolProgramDetailsPage /></LazyPage> },
+          { path: "files", element: <LazyPage><SchoolFilesPage /></LazyPage> },
+          { path: "announcements", element: <LazyPage><SchoolAnnouncementsPage /></LazyPage> },
+          { path: "announcements/:announcementId", element: <LazyPage><AnnouncementDetailsPage /></LazyPage> },
+          { path: "services", element: <LazyPage><SchoolServicesPage /></LazyPage> },
+          { path: "contact", element: <LazyPage><SchoolContactPage /></LazyPage> }
         ]
       }
     ]
@@ -134,39 +158,39 @@ export const router = createBrowserRouter([
     path: "/app",
     element: <ProtectedAppLayout />,
     children: [
-      { index: true, element: <DashboardPage /> },
-      { path: "schools", element: <SchoolsPage /> },
-      { path: "schools/:schoolId", element: <SchoolDetailsPage /> },
-      { path: "programs", element: <ProgramsPage /> },
-      { path: "inspirational-quotes", element: <InspirationalQuotesPage /> },
-      { path: "users", element: <UsersPage /> },
-      { path: "account-approvals", element: <AccountApprovalsPage /> },
-      { path: "audit-logs", element: <AuditLogsPage /> },
-      { path: "announcements", element: <AnnouncementsPage /> },
-      { path: "announcements/:announcementId", element: <AnnouncementDetailsPage /> },
-      { path: "students", element: <StudentsPage /> },
-      { path: "students/:studentId", element: <StudentDetailsPage /> },
-      { path: "students/:studentId/edit", element: <StudentEditPage /> },
-      { path: "iep-plans", element: <IepPlansPage /> },
-      { path: "iep-plans/create", element: <IepPlanCreatePage /> },
-      { path: "iep-plans/schools/:schoolId/programs", element: <SupervisorIepSchoolProgramsPage /> },
-      { path: "iep-plans/schools/:schoolId/programs/:programId/classes", element: <SupervisorIepProgramClassesPage /> },
+      { index: true, element: <LazyPage><DashboardPage /></LazyPage> },
+      { path: "schools", element: <LazyPage><SchoolsPage /></LazyPage> },
+      { path: "schools/:schoolId", element: <LazyPage><SchoolDetailsPage /></LazyPage> },
+      { path: "programs", element: <LazyPage><ProgramsPage /></LazyPage> },
+      { path: "inspirational-quotes", element: <LazyPage><InspirationalQuotesPage /></LazyPage> },
+      { path: "users", element: <LazyPage><UsersPage /></LazyPage> },
+      { path: "account-approvals", element: <LazyPage><AccountApprovalsPage /></LazyPage> },
+      { path: "audit-logs", element: <LazyPage><AuditLogsPage /></LazyPage> },
+      { path: "announcements", element: <LazyPage><AnnouncementsPage /></LazyPage> },
+      { path: "announcements/:announcementId", element: <LazyPage><AnnouncementDetailsPage /></LazyPage> },
+      { path: "students", element: <LazyPage><StudentsPage /></LazyPage> },
+      { path: "students/:studentId", element: <LazyPage><StudentDetailsPage /></LazyPage> },
+      { path: "students/:studentId/edit", element: <LazyPage><StudentEditPage /></LazyPage> },
+      { path: "iep-plans", element: <LazyPage><IepPlansPage /></LazyPage> },
+      { path: "iep-plans/create", element: <LazyPage><IepPlanCreatePage /></LazyPage> },
+      { path: "iep-plans/schools/:schoolId/programs", element: <LazyPage><SupervisorIepSchoolProgramsPage /></LazyPage> },
+      { path: "iep-plans/schools/:schoolId/programs/:programId/classes", element: <LazyPage><SupervisorIepProgramClassesPage /></LazyPage> },
       {
         path: "iep-plans/schools/:schoolId/programs/:programId/classes/:classKey/teachers",
-        element: <SupervisorIepClassTeachersPage />
+        element: <LazyPage><SupervisorIepClassTeachersPage /></LazyPage>
       },
       {
         path: "iep-plans/schools/:schoolId/programs/:programId/classes/:classKey/teachers/:teacherId/plans",
-        element: <SupervisorIepTeacherStudentsPage />
+        element: <LazyPage><SupervisorIepTeacherStudentsPage /></LazyPage>
       },
-      { path: "iep-plans/:planId", element: <IepPlanDetailsPage /> },
-      { path: "iep-plans/:planId/edit", element: <IepPlanEditPage /> },
-      { path: "messages", element: <MessagesPage /> },
-      { path: "messages/:threadKey", element: <MessagesPage /> },
-      { path: "notifications", element: <NotificationsPage /> },
-      { path: "reports", element: <ReportsPage /> },
-      { path: "files", element: <FilesPage /> },
-      { path: "teacher-portfolio", element: <PortfolioPage /> }
+      { path: "iep-plans/:planId", element: <LazyPage><IepPlanDetailsPage /></LazyPage> },
+      { path: "iep-plans/:planId/edit", element: <LazyPage><IepPlanEditPage /></LazyPage> },
+      { path: "messages", element: <LazyPage><MessagesPage /></LazyPage> },
+      { path: "messages/:threadKey", element: <LazyPage><MessagesPage /></LazyPage> },
+      { path: "notifications", element: <LazyPage><NotificationsPage /></LazyPage> },
+      { path: "reports", element: <LazyPage><ReportsPage /></LazyPage> },
+      { path: "files", element: <LazyPage><FilesPage /></LazyPage> },
+      { path: "teacher-portfolio", element: <LazyPage><PortfolioPage /></LazyPage> }
     ]
   },
   {

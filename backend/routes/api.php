@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\EducationProgramController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\IepPlanController;
+use App\Http\Controllers\Api\V1\IepGoalBankController;
 use App\Http\Controllers\Api\V1\InspirationalQuoteController;
 use App\Http\Controllers\Api\V1\MessageController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -79,6 +80,14 @@ Route::prefix('v1')->group(function (): void {
         Route::get('reports/pivot', [ReportController::class, 'pivot']);
         Route::get('reports/export/pdf', [ReportController::class, 'exportPdf']);
         Route::get('reports/export/excel', [ReportController::class, 'exportExcel']);
+
+        Route::prefix('iep-goal-bank')->group(function (): void {
+            Route::get('/', [IepGoalBankController::class, 'index']);
+            Route::get('domains', [IepGoalBankController::class, 'domains']);
+            Route::post('/', [IepGoalBankController::class, 'store']);
+            Route::put('{iepGoalBank}', [IepGoalBankController::class, 'update']);
+            Route::delete('{iepGoalBank}', [IepGoalBankController::class, 'destroy']);
+        });
 
         Route::middleware('tenant:required')->group(function (): void {
             Route::apiResource('students', StudentController::class)->except(['destroy']);
